@@ -93,6 +93,10 @@ int commitCommand(int argc, char* argv[]) {
         printf("commit message too long!");
         return 0;
     }
+    if(argv[3][0]=='"' && argv[3][1]=='"') {
+        printf("There is no comment to your commit!");
+        return 0;
+    }
     if(error_occured==1) {
         printf("Invalid command due to misspell or extra words!");
         return 0;
