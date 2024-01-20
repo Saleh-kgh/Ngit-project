@@ -22,6 +22,9 @@ int main(int argc, char *argv[]) {
     else if(strcmp(argv[1], "status")==0) {
         statusCommand(argc, argv);
     }
+    else if(strcmp(argv[1], "commit")==0) {
+        commitCommand(argc, argv);
+    }
     else {
         printf("Invalid command due to unacceptable depth number!");
     }
