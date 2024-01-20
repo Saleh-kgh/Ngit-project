@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-int userInfo(int argc, char* argv[]) {
+int userInfoSER(int argc, char* argv[]) {
     int error_occured=0;
     if(argc!=4 && argc!=5) error_occured=1;
     if(argc==5) {
@@ -18,7 +18,7 @@ int userInfo(int argc, char* argv[]) {
     return 1;
 }
 
-int aliasCommand(int argc, char* argv[]) {
+int aliasSER(int argc, char* argv[]) {
     int error_occured=0;
     char alias_spell[6]="alais.";
     if(argc!=4 && argc!=5) error_occured=1;
@@ -46,7 +46,7 @@ int aliasCommand(int argc, char* argv[]) {
     return 1;
 }
 
-int initCount(int argc, char* argv[]) {
+int initSER(int argc, char* argv[]) {
     if(argc!=2) {
         printf("Invalid command due to misspell or extra words!");
         return 0;
@@ -54,7 +54,7 @@ int initCount(int argc, char* argv[]) {
     return 1;
 }
 
-int addCommand(int argc, char* argv[]) {
+int addSER(int argc, char* argv[]) {
     int error_occured=0;
     if(argc<3) error_occured=1;
     if(argc==3 && strcmp(argv[2], "-redo")==0) return 2;
@@ -77,7 +77,7 @@ int addCommand(int argc, char* argv[]) {
     return 1;
 }
 
-int statusCommand(int argc, char* argv[]) {
+int statusSER(int argc, char* argv[]) {
     if(argc!=2) {
         printf("Invalid command due to misspell or extra words!");
         return 0;
@@ -85,7 +85,7 @@ int statusCommand(int argc, char* argv[]) {
     return 1;
 }
 
-int commitCommand(int argc, char* argv[]) {
+int commitSER(int argc, char* argv[]) {
     int error_occured=0;
     if(strcmp(argv[2], "-m")!=0) error_occured=1;
     if(strlen(argv[3])>75) {
