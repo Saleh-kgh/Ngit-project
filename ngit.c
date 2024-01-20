@@ -19,6 +19,9 @@ int main(int argc, char *argv[]) {
     else if(strcmp(argv[1], "add")==0) {
         addCommand(argc, argv);
     }
+    else if(strcmp(argv[1], "status")==0) {
+        statusCommand(argc, argv);
+    }
     else {
         printf("Invalid command due to unacceptable depth number!");
     }
