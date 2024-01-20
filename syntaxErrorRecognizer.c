@@ -119,3 +119,15 @@ int setSER(int argc, char* argv[]) {
     }
     return 1;
 }
+
+int replaceSER(int argc, char* argv[]) {
+    int error_occured=0;
+    if(argc!=6) error_occured=1;
+    if(strcmp(argv[2], "-m")!=0) error_occured=1;
+    if(strcmp(argv[4], "-s")!=0) error_occured=1;
+    if(error_occured==1) {
+        printf("Invalid command due to misspell or extra words!");
+        return 0;
+    }
+    return 1;
+}
