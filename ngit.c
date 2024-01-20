@@ -37,6 +37,12 @@ int main(int argc, char *argv[]) {
     else if(strcmp(argv[1], "log")==0) {
         logSER(argc, argv);
     }
+    else if(strcmp(argv[1], "branch")==0) {
+        branchSER(argc, argv);
+    }
+    else if(strcmp(argv[1], "checkout")==0) {
+        checkoutSER(argc, argv);
+    }
     else {
         printf("Invalid command due to misspell or extra words!");
     }

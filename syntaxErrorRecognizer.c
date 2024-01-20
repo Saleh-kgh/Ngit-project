@@ -162,3 +162,35 @@ int logSER(int argc, char* argv[]) {
     }
     return 1;
 }
+
+int branchSER(int argc, char* argv[]) {
+    int error_occured=0;
+    if(argc>3) error_occured=1;
+    if(error_occured==1) {
+        printf("Invalid command due to misspell or extra words.");
+        return 0;
+    }
+    if(argc==3) return 2; 
+    return 1;
+}
+
+int checkoutSER(int argc, char* argv[]) {
+    int error_occured=0;
+    if(argc!=3) error_occured=1;
+    char head[4]="HEAD";
+    int i;
+    for(i=0; i<4; i++) {
+        if(head[i]!=argv[2][i])
+            break;
+    }
+    if(i==4) {
+        if(strlen(argv[2])==4)
+            return 2;
+        return 3;
+    }
+    if(error_occured==1) {
+        printf("Invalid command due to misspell or extra words.");
+        return 0;
+    }
+    return 1;
+}

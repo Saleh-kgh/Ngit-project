@@ -11,5 +11,7 @@ int setSER(int argc, char* argv[]);
 int replaceSER(int argc, char* argv[]);
 int removeSER(int argc, char* argv[]);
 int logSER(int argc, char* argv[]);
+int branchSER(int argc, char* argv[]);
+int checkoutSER(int argc, char* argv[]);
 
 #endif
