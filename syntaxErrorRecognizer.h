@@ -7,5 +7,6 @@ int initSER(int argc, char* argv[]);
 int addSER(int argc, char* argv[]);
 int statusSER(int argc, char* argv[]);
 int commitSER(int argc, char* argv[]);
+int setSER(int argc, char* argv[]);
 
 #endif

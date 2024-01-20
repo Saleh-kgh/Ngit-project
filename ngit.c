@@ -25,6 +25,9 @@ int main(int argc, char *argv[]) {
     else if(strcmp(argv[1], "commit")==0) {
         commitSER(argc, argv);
     }
+    else if(strcmp(argv[1], "set")==0) {
+        setSER(argc, argv);
+    }
     else {
         printf("Invalid command due to misspell or extra words!");
     }
