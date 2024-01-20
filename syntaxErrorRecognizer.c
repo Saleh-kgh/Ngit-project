@@ -76,3 +76,11 @@ int addCommand(int argc, char* argv[]) {
     }
     return 1;
 }
+
+int statusCommand(int argc, char* argv[]) {
+    if(argc!=2) {
+        printf("Invalid command due to misspell or extra words!");
+        return 0;
+    }
+    return 1;
+}
