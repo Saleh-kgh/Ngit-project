@@ -87,16 +87,20 @@ int statusCommand(int argc, char* argv[]) {
 
 int commitCommand(int argc, char* argv[]) {
     int error_occured=0;
-    if(argc!=4) error_occured=1;
     if(strcmp(argv[2], "-m")!=0) error_occured=1;
     if(strlen(argv[3])>75) {
         printf("commit message too long!");
         return 0;
     }
-    if(argv[3][0]=='"' && argv[3][1]=='"') {
+    /*if(argv[3][0]==97 && argv[3][1]==97) {
+        printf("There is no comment to your commit!");
+        return 0;
+    }*/
+    if(argc==3 && error_occured==0) {
         printf("There is no comment to your commit!");
         return 0;
     }
+    if(argc!=4) error_occured=1;
     if(error_occured==1) {
         printf("Invalid command due to misspell or extra words!");
         return 0;
