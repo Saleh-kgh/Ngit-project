@@ -26,7 +26,7 @@ int main(int argc, char *argv[]) {
         commitCommand(argc, argv);
     }
     else {
-        printf("Invalid command due to unacceptable depth number!");
+        printf("Invalid command due to misspell or extra words!");
     }
     return 0;
 }
