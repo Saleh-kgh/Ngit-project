@@ -9,5 +9,6 @@ int statusSER(int argc, char* argv[]);
 int commitSER(int argc, char* argv[]);
 int setSER(int argc, char* argv[]);
 int replaceSER(int argc, char* argv[]);
+int removeSER(int argc, char* argv[]);
 
 #endif
