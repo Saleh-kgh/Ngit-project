@@ -12,7 +12,7 @@ int userInfoSER(int argc, char* argv[]) {
         if(strcmp(argv[2],"user.name")!=0 && strcmp(argv[2],"user.email")!=0) error_occured=1;
     }
     if(error_occured==1) {
-        printf("Invalid command due to misspell or extra words!");
+        printf("Invalid command due to misspell or extra words.");
         return 0;
     }
     return 1;
@@ -40,7 +40,7 @@ int aliasSER(int argc, char* argv[]) {
         } 
     }
     if(error_occured==1) {
-        printf("Invalid command due to misspell or extra words!");
+        printf("Invalid command due to misspell or extra words.");
         return 0;
     }
     return 1;
@@ -48,7 +48,7 @@ int aliasSER(int argc, char* argv[]) {
 
 int initSER(int argc, char* argv[]) {
     if(argc!=2) {
-        printf("Invalid command due to misspell or extra words!");
+        printf("Invalid command due to misspell or extra words.");
         return 0;
     }
     return 1;
@@ -64,14 +64,14 @@ int addSER(int argc, char* argv[]) {
     if(strcmp(argv[2],"-n")==0) {
         int length = strlen(argv[3]);
         for(int i=0; i<length; i++) {
-            if(argv[3][i]<47 || argv[3][i]>57) {
-                printf("Invalid command due to unacceptable depth number!");
+            if(argv[3][i]<48 || argv[3][i]>57) {
+                printf("Invalid command due to unacceptable depth number.");
                 return 0;
             }
         }
     }
     if(error_occured==1) {
-        printf("Invalid command due to misspell or extra words!");
+        printf("Invalid command due to misspell or extra words.");
         return 0;
     }
     return 1;
@@ -79,7 +79,7 @@ int addSER(int argc, char* argv[]) {
 
 int statusSER(int argc, char* argv[]) {
     if(argc!=2) {
-        printf("Invalid command due to misspell or extra words!");
+        printf("Invalid command due to misspell or extra words.");
         return 0;
     }
     return 1;
@@ -89,7 +89,7 @@ int commitSER(int argc, char* argv[]) {
     int error_occured=0;
     if(strcmp(argv[2], "-m")!=0) error_occured=1;
     if(strlen(argv[3])>75) {
-        printf("commit message too long!");
+        printf("commit message too long.");
         return 0;
     }
     /*if(argv[3][0]==97 && argv[3][1]==97) {
@@ -97,12 +97,12 @@ int commitSER(int argc, char* argv[]) {
         return 0;
     }*/
     if(argc==3 && error_occured==0) {
-        printf("There is no comment to your commit!");
+        printf("There is no comment to your commit.");
         return 0;
     }
     if(argc!=4) error_occured=1;
     if(error_occured==1) {
-        printf("Invalid command due to misspell or extra words!");
+        printf("Invalid command due to misspell or extra words.");
         return 0;
     }
     return 1;
@@ -114,7 +114,7 @@ int setSER(int argc, char* argv[]) {
     if(strcmp(argv[2], "-m")!=0) error_occured=1;
     if(strcmp(argv[4], "-s")!=0) error_occured=1;
     if(error_occured==1) {
-        printf("Invalid command due to misspell or extra words!");
+        printf("Invalid command due to misspell or extra words.");
         return 0;
     }
     return 1;
@@ -126,7 +126,7 @@ int replaceSER(int argc, char* argv[]) {
     if(strcmp(argv[2], "-m")!=0) error_occured=1;
     if(strcmp(argv[4], "-s")!=0) error_occured=1;
     if(error_occured==1) {
-        printf("Invalid command due to misspell or extra words!");
+        printf("Invalid command due to misspell or extra words.");
         return 0;
     }
     return 1;
@@ -137,7 +137,27 @@ int removeSER(int argc, char* argv[]) {
     if(argc!=4) error_occured=1;
     if(strcmp(argv[2], "-s")!=0) error_occured=1;
     if(error_occured==1) {
-        printf("Invalid command due to misspell or extra words!");
+        printf("Invalid command due to misspell or extra words.");
+        return 0;
+    }
+    return 1;
+}
+
+int logSER(int argc, char* argv[]) {
+    int error_occured=0;
+    if(argc!=4) error_occured=1;
+    if((strcmp(argv[2], "-n")!=0) && (strcmp(argv[2], "-branch")!=0) && (strcmp(argv[2], "-author")!=0) && (strcmp(argv[2], "-since")!=0) && (strcmp(argv[2], "-before")!=0) && (strcmp(argv[2], "-search")!=0))
+        error_occured=1;
+    int length = strlen(argv[3]);
+    for(int i=0; i<length; i++) {
+        if(argv[3][i]<48 || argv[3][i]>57) {
+            printf("Invalid command due to unacceptable number.");
+            return 0;
+        }
+    }
+    // code for invalid date of since and before
+    if(error_occured==1) {
+        printf("Invalid command due to misspell or extra words.");
         return 0;
     }
     return 1;

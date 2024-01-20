@@ -34,6 +34,9 @@ int main(int argc, char *argv[]) {
     else if(strcmp(argv[1], "remove")==0) {
         removeSER(argc, argv);
     }
+    else if(strcmp(argv[1], "log")==0) {
+        logSER(argc, argv);
+    }
     else {
         printf("Invalid command due to misspell or extra words!");
     }
