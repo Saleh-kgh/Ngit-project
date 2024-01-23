@@ -15,7 +15,7 @@ int makeHiddenNgitDir() {
                 printf("directory is already set as a ngit repository.");
                 returnValue=1;
             } 
-            if (SetFileAttributes(currentDirectory, FILE_ATTRIBUTE_HIDDEN)) {
+            else if (SetFileAttributes(currentDirectory, FILE_ATTRIBUTE_DIRECTORY)) {
                 printf("directory is succesfully initialized as a ngit repository.\n");
             } 
         } 

@@ -4,7 +4,34 @@
 #include "syntaxErrorRecognizer.h"
 #include "ngitHiddenDir.h"
 
+struct startupinfo {
+    char username[50];
+    char useremail[100];
+    char currentbranch[50];
+    char currentpath[100];
+    int repositoryCount;
+}startupInfo;
+
+void startUp() {
+    FILE* startUpfile = fopen("d:\\ANGP\\ngit-project\\startUp.txt", "r+");
+    char content[100];
+    fgets(content, sizeof(content), startUpfile);
+    strcpy(startupInfo.username, content);
+    fgets(content, sizeof(content), startUpfile);
+    strcpy(startupInfo.useremail, content);
+    fgets(content, sizeof(content), startUpfile);
+    strcpy(startupInfo.currentbranch, content);
+    int lineCount=0;
+    while(fgets(content, sizeof(content), startUpfile) != NULL) {
+        lineCount++;
+        strcpy(startupInfo.currentpath, content);
+    }
+    startupInfo.repositoryCount=lineCount;
+    fclose(startUpfile);
+}
+
 int main(int argc, char *argv[]) {
+    startUp();
     if(strcmp(argv[1], "config")==0) {
         if(strcmp(argv[2], "user.name")==0 || strcmp(argv[3], "user.name")==0) if(userInfoSER(argc, argv)==0) return 0;
         else if(strcmp(argv[2], "user.email")==0 || strcmp(argv[3], "user.email")==0) if(userInfoSER(argc, argv)==0) return 0; 
