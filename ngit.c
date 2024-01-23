@@ -13,14 +13,12 @@ struct startupinfo {
 }startupInfo;
 
 void startUp() {
-    FILE* startUpfile = fopen("d:\\ANGP\\ngit-project\\startUp.txt", "r+");
+    FILE* startUpfile = fopen("d:\\ANGP\\ngit-project\\startUp.txt", "r");
     char content[100];
     fgets(content, sizeof(content), startUpfile);
     strcpy(startupInfo.username, content);
     fgets(content, sizeof(content), startUpfile);
     strcpy(startupInfo.useremail, content);
-    fgets(content, sizeof(content), startUpfile);
-    strcpy(startupInfo.currentbranch, content);
     int lineCount=0;
     while(fgets(content, sizeof(content), startUpfile) != NULL) {
         lineCount++;
@@ -28,6 +26,10 @@ void startUp() {
     }
     startupInfo.repositoryCount=lineCount;
     fclose(startUpfile);
+    FILE* branchfile=fopen("d:\\ANGP\\ngit-project\\currentbranch.txt","r");
+    fgets(content, sizeof(content), branchfile);
+    strcpy(startupInfo.currentbranch, content);
+    fclose(branchfile);
 }
 
 int main(int argc, char *argv[]) {

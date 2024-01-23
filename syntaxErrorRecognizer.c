@@ -3,6 +3,7 @@
 #include <string.h>
 int userInfoSER(int argc, char* argv[]) {
     int error_occured=0;
+    int returnValue=1;
     if(argc!=4 && argc!=5) error_occured=1;
     if(argc==5) {
         if(strcmp(argv[2], "-global")!=0) error_occured=1;           
@@ -10,12 +11,13 @@ int userInfoSER(int argc, char* argv[]) {
     }
     if(argc==4) {
         if(strcmp(argv[2],"user.name")!=0 && strcmp(argv[2],"user.email")!=0) error_occured=1;
+        returnValue=2;
     }
     if(error_occured==1) {
-        printf("Invalid command due to misspell or extra words.");
+        printf("Invalid command due to misspell or extra words.");       
         return 0;
     }
-    return 1;
+    return returnValue;
 }
 
 int aliasSER(int argc, char* argv[]) {

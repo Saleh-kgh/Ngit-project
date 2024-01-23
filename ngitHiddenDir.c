@@ -6,17 +6,70 @@
 int makeHiddenNgitDir() {
     char *folderName = "ngit";
     char currentDirectory[MAX_PATH];
-    int returnValue=0;
     if (GetCurrentDirectory(MAX_PATH, currentDirectory) != 0) {
         strcat(currentDirectory, "\\");
         strcat(currentDirectory, folderName);
         if (CreateDirectory(currentDirectory, NULL) || ERROR_ALREADY_EXISTS == GetLastError()) {
             if (GetLastError() == ERROR_ALREADY_EXISTS) {
                 printf("directory is already set as a ngit repository.");
-                returnValue=1;
             } 
             else if (SetFileAttributes(currentDirectory, FILE_ATTRIBUTE_DIRECTORY)) {
                 printf("directory is succesfully initialized as a ngit repository.\n");
+                char curDirpathCopy[MAX_PATH];
+                strcpy(curDirpathCopy, currentDirectory);
+                strcat(currentDirectory, "\\info");
+                CreateDirectory(currentDirectory, NULL);
+                strcat(currentDirectory, "\\initial.txt");
+                FILE* startUpfile = fopen("d:\\ANGP\\ngit-project\\startUp.txt", "r+");
+                char content[100];
+                char username[100];
+                char useremail[100];
+                fgets(content, sizeof(content), startUpfile);
+                strcpy(username, content);
+                fgets(content, sizeof(content), startUpfile);
+                strcpy(useremail, content);
+                fgets(content, sizeof(content), startUpfile);
+                fputs("\n", startUpfile);
+                char currentDirectory[MAX_PATH];
+                GetCurrentDirectory(MAX_PATH, currentDirectory);
+                fputs(currentDirectory, startUpfile);
+                fclose(startUpfile);
+                FILE* fptr=fopen(currentDirectory, "w");
+                fputs(username, fptr);
+                fputs(useremail, fptr);
+                fputs("1\n", fptr);
+                fputs("0", fptr);
+                fclose(fptr);
+                strcpy(currentDirectory, curDirpathCopy);
+                strcat(currentDirectory, "\\info\\commithasehs.txt");
+                FILE* fptr2=fopen(currentDirectory, "w");
+                fclose(fptr2);
+                strcpy(currentDirectory, curDirpathCopy);
+                strcat(currentDirectory, "\\branches");
+                CreateDirectory(currentDirectory, NULL);
+                strcat(currentDirectory, "\\master");
+                CreateDirectory(currentDirectory, NULL);
+                strcat(currentDirectory, "\\commithistory");
+                CreateDirectory(currentDirectory, NULL);
+                strcpy(currentDirectory, curDirpathCopy);
+                strcat(currentDirectory, "\\stagingArea");
+                CreateDirectory(currentDirectory, NULL);
+                strcpy(currentDirectory, curDirpathCopy);
+                strcat(currentDirectory, "\\stashingArea");
+                CreateDirectory(currentDirectory, NULL);
+                FILE* curbranchfile=fopen("d:\\ANGP\\ngit-project\\currentbranch.txt", "r");
+                if(curbranchfile==NULL) {
+                    fclose(curbranchfile);
+                    curbranchfile=fopen("d:\\ANGP\\ngit-project\\currentbranch.txt", "w");
+                    fputs("master", curbranchfile);
+                }
+                else {
+                    fclose(curbranchfile);
+                    remove("d:\\ANGP\\ngit-project\\currentbranch.txt");
+                    curbranchfile=fopen("d:\\ANGP\\ngit-project\\currentbranch.txt", "w");
+                    fputs("master", curbranchfile);
+                }
+                fclose(curbranchfile);
             } 
         } 
         else {
@@ -24,6 +77,6 @@ int makeHiddenNgitDir() {
             return 0;
         }
     }
-    if(returnValue==1) return 2;
     return 1;
 }
+
