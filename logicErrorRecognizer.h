@@ -1,6 +1,7 @@
 #ifndef LOGICERRORRECOGNIZER_H
 #define LOGICERRORRECOGNIZER_H
 
-int initLogicCheck();
+int userInfoLER();
+int initLER();
 
 #endif

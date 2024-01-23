@@ -15,30 +15,32 @@ int makeHiddenNgitDir() {
             } 
             else if (SetFileAttributes(currentDirectory, FILE_ATTRIBUTE_DIRECTORY)) {
                 printf("directory is succesfully initialized as a ngit repository.\n");
+                FILE* reposfile=fopen("d:\\ANGP\\ngit-project\\repositories.txt", "a");
+                fputs("\n", reposfile);
+                char currentDirectory[MAX_PATH];
+                GetCurrentDirectory(MAX_PATH, currentDirectory);
+                fputs(currentDirectory, reposfile);
+                fclose(reposfile);
                 char curDirpathCopy[MAX_PATH];
+                strcat(currentDirectory, "\\ngit");
                 strcpy(curDirpathCopy, currentDirectory);
                 strcat(currentDirectory, "\\info");
                 CreateDirectory(currentDirectory, NULL);
-                strcat(currentDirectory, "\\initial.txt");
-                FILE* startUpfile = fopen("d:\\ANGP\\ngit-project\\startUp.txt", "r+");
+                FILE* userInfofile = fopen("d:\\ANGP\\ngit-project\\userInfo.txt", "r+");
                 char content[100];
                 char username[100];
                 char useremail[100];
-                fgets(content, sizeof(content), startUpfile);
+                fgets(content, sizeof(content), userInfofile);
                 strcpy(username, content);
-                fgets(content, sizeof(content), startUpfile);
+                fgets(content, sizeof(content), userInfofile);
                 strcpy(useremail, content);
-                fgets(content, sizeof(content), startUpfile);
-                fputs("\n", startUpfile);
-                char currentDirectory[MAX_PATH];
-                GetCurrentDirectory(MAX_PATH, currentDirectory);
-                fputs(currentDirectory, startUpfile);
-                fclose(startUpfile);
+                fclose(userInfofile);
+                strcat(currentDirectory, "\\localuser.txt");
                 FILE* fptr=fopen(currentDirectory, "w");
                 fputs(username, fptr);
                 fputs(useremail, fptr);
-                fputs("1\n", fptr);
-                fputs("0", fptr);
+                //fputs("1\n", fptr); // tedade branch
+                //fputs("0", fptr); // tedade commit
                 fclose(fptr);
                 strcpy(currentDirectory, curDirpathCopy);
                 strcat(currentDirectory, "\\info\\commithasehs.txt");
