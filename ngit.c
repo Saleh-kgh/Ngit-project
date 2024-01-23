@@ -3,6 +3,7 @@
 #include <windows.h>
 #include "syntaxErrorRecognizer.h"
 #include "ngitHiddenDir.h"
+#include "logicErrorRecognizer.h"
 
 struct startupinfo {
     char username[50];
@@ -48,6 +49,7 @@ int main(int argc, char *argv[]) {
     }
     else if(strcmp(argv[1], "init")==0) {
         if(initSER(argc, argv)==0) return 0;
+        if(initLogicCheck()==0) return 0;
         int dirState = makeHiddenNgitDir();
     }
     else if(strcmp(argv[1], "add")==0) {
