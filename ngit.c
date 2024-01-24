@@ -5,6 +5,7 @@
 #include "ngitHiddenDir.h"
 #include "logicErrorRecognizer.h"
 #include "userinfoEditor.h"
+#include "listofcontents.h"
 
 struct startupinfo {
     char username[50];
@@ -73,6 +74,7 @@ int main(int argc, char *argv[]) {
         if(initSER(argc, argv)==0) return 0;
         if(initLER()==0) return 0;
         makeHiddenNgitDir();
+        listDirectories(1);
     }
     else if(strcmp(argv[1], "add")==0) {
         if(addSER(argc, argv)==0) return 0;

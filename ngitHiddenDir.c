@@ -16,16 +16,20 @@ int makeHiddenNgitDir() {
             else if (SetFileAttributes(currentDirectory, FILE_ATTRIBUTE_DIRECTORY)) {
                 printf("directory is succesfully initialized as a ngit repository.\n");
                 FILE* reposfile=fopen("d:\\ANGP\\ngit-project\\repositories.txt", "a");
-                fputs("\n", reposfile);
                 char currentDirectory[MAX_PATH];
                 GetCurrentDirectory(MAX_PATH, currentDirectory);
                 fputs(currentDirectory, reposfile);
+                fputs("\n", reposfile);
                 fclose(reposfile);
                 char curDirpathCopy[MAX_PATH];
                 strcat(currentDirectory, "\\ngit");
                 strcpy(curDirpathCopy, currentDirectory);
                 strcat(currentDirectory, "\\info");
                 CreateDirectory(currentDirectory, NULL);
+                strcat(currentDirectory, "\\contents");
+                CreateDirectory(currentDirectory, NULL);
+                strcpy(currentDirectory, curDirpathCopy);
+                strcat(currentDirectory, "\\info");
                 FILE* userInfofile = fopen("d:\\ANGP\\ngit-project\\userInfo.txt", "r+");
                 char content[100];
                 char username[100];
