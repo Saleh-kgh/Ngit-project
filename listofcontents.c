@@ -11,6 +11,10 @@ void listDirectories(int isOld) {
     char repoPath[MAX_PATH];
     FILE* reposfile=fopen("d:\\ANGP\\ngit-project\\repositories.txt","r");
     while(fgets(repoPath, sizeof(repoPath), reposfile)!= NULL) {
+        size_t len = strlen(repoPath);
+        if (len > 0 && repoPath[len - 1] == '\n') {
+            repoPath[len - 1] = '\0';
+        }
         char* result = strstr(outputPath, repoPath);
         if(result!=NULL) break;
     }
@@ -64,6 +68,10 @@ void listDirectories(int isOld) {
             }
             FILE* dirsfileptr=fopen(Dirsfile, "r");
             while(fgets(dirPath, sizeof(dirPath), dirsfileptr)) {
+                size_t len = strlen(repoPath);
+                if (len > 0 && repoPath[len - 1] == '\n') {
+                    repoPath[len - 1] = '\0';
+                }
                 dirPath[strcspn(dirPath, "\n")] = '\0';
                 DIR* dirptr = opendir(dirPath);
                 while ((entry = readdir(dirptr)) != NULL) {
@@ -98,6 +106,10 @@ void listFiles(int isOld) {
     char repoPath[MAX_PATH];
     FILE* reposfile=fopen("d:\\ANGP\\ngit-project\\repositories.txt","r");
     while(fgets(repoPath, sizeof(repoPath), reposfile)!= NULL) {
+        size_t len = strlen(repoPath);
+        if (len > 0 && repoPath[len - 1] == '\n') {
+            repoPath[len - 1] = '\0';
+        }
         char* result = strstr(outputPath, repoPath);
         if(result!=NULL) break;
     }
@@ -155,6 +167,10 @@ void listFiles(int isOld) {
             }
             FILE* dirsfileptr=fopen(Dirsfile, "r");
             while(fgets(dirPath, sizeof(dirPath), dirsfileptr)) {
+                size_t len = strlen(repoPath);
+                if (len > 0 && repoPath[len - 1] == '\n') {
+                    repoPath[len - 1] = '\0';
+                }
                 dirPath[strcspn(dirPath, "\n")] = '\0';
                 DIR* dirptr = opendir(dirPath);
                 while ((entry = readdir(dirptr)) != NULL) {

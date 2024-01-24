@@ -6,6 +6,7 @@
 #include "logicErrorRecognizer.h"
 #include "userinfoEditor.h"
 #include "listofcontents.h"
+#include "addtoStage.h"
 
 struct startupinfo {
     char username[50];
@@ -79,6 +80,17 @@ int main(int argc, char *argv[]) {
     }
     else if(strcmp(argv[1], "add")==0) {
         if(addSER(argc, argv)==0) return 0;
+        if(addLER(argc, argv)==0) return 0;
+        listDirectories(0);
+        listFiles(0);
+        if(argc==3) {
+            addtoStage(argv[2]);
+        }
+        else {
+            for(int i=3; i<argc; i++) {
+                addtoStage(argv[i]);
+            }
+        }
     }
     else if(strcmp(argv[1], "status")==0) {
         if(statusSER(argc, argv)==0) return 0;
