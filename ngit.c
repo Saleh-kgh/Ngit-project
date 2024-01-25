@@ -81,6 +81,12 @@ int main(int argc, char *argv[]) {
     else if(strcmp(argv[1], "add")==0) {
         if(addSER(argc, argv)==0) return 0;
         if(addLER(argc, argv)==0) return 0;
+        /*char target='*';
+        char* result=strchr(argv[2], target);
+        if(result!=NULL) {
+            printf("wildcard mojood nist");
+            return 0;
+        } */
         listDirectories(0);
         listFiles(0);
         if(argc==3) {

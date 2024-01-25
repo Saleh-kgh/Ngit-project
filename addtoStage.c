@@ -19,11 +19,8 @@ void addtoStage(char argv[]) {
     }
     fclose(reposfile);
     char stagedfileaddress[MAX_PATH];
-    char newstagedaddress[MAX_PATH];
     strcpy(stagedfileaddress, repoPath);
-    strcpy(newstagedaddress, repoPath);
     strcat(stagedfileaddress, "\\ngit\\info\\stagedfiles.txt");
-    strcat(newstagedaddress, "\\ngit\\info\\newstagedfiles.txt");
     char repoPathcopy[MAX_PATH];
     strcpy(repoPathcopy, filePath);
     strcat(filePath, "\\");
@@ -54,24 +51,10 @@ void addtoStage(char argv[]) {
         strcat(repoPath, "\\");
         strcat(repoPath, piecesofFilepath[idx-1]);
         char filetocopy[MAX_PATH];
-        FILE* stagedfilesptr=fopen(stagedfileaddress, "r");
-        FILE* newstagedptr=fopen(newstagedaddress, "w");
-        while(fgets(filetocopy, sizeof(filetocopy), stagedfilesptr)!= NULL) {
-            size_t len = strlen(filetocopy);
-            if (len > 0 && filetocopy[len - 1] == '\n') {
-                filetocopy[len - 1] = '\0';
-            }
-            if(strstr(filetocopy, filePathcopy)==NULL) {
-                fputs(filetocopy, newstagedptr);
-                fputs("\n", newstagedptr);
-            }
-        }
-        fputs(filePathcopy, newstagedptr);
-        fputs("\n", newstagedptr);
+        FILE* stagedfilesptr=fopen(stagedfileaddress, "a");
+        fputs(filePathcopy, stagedfilesptr);
+        fputs("\n", stagedfilesptr);
         fclose(stagedfilesptr);
-        fclose(newstagedptr);
-        remove(stagedfileaddress);
-        //rename(newstagedaddress, stagedfileaddress);
         FILE *batchFile = fopen("copydir.bat", "w");
         fprintf(batchFile, "@echo off\n");
         fprintf(batchFile, "set \"sourceDirectory=%s\"\n", filePathcopy);
