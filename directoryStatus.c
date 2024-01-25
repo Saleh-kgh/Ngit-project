@@ -4,52 +4,7 @@
 #include <windows.h>
 #include <dirent.h>
 
-void directoryStatus() {
-    char directoryPath[MAX_PATH];
-    GetCurrentDirectory(MAX_PATH, directoryPath);
-    char repoPath[MAX_PATH];
-    FILE* reposfile=fopen("d:\\ANGP\\ngit-project\\repositories.txt","r");
-    while(fgets(repoPath, sizeof(repoPath), reposfile)!= NULL) {
-        size_t len = strlen(repoPath);
-        if (len > 0 && repoPath[len - 1] == '\n') {
-            repoPath[len - 1] = '\0';
-        }
-        char* result = strstr(directoryPath, repoPath);
-        if(result!=NULL) {
-            break;
-        } 
-    }
-    fclose(reposfile);
-
-    char dirPathcopy[MAX_PATH];
-    strcpy(dirPathcopy, directoryPath);        
-    char *match = strstr(dirPathcopy, repoPath);
-    memmove(match, match + strlen(repoPath), strlen(match + strlen(repoPath)) + 1);
-    int idx=0;
-    char* piece=strtok(dirPathcopy, "\\");
-    while(piece!=NULL) {
-        piece=strtok(NULL,"\\");
-        idx++;
-    }
-    int fileDepth=idx;
-
-    char filePath[MAX_PATH];
-    DIR *dir = opendir(directoryPath);
-    struct dirent *entry;
-    while ((entry = readdir(dir)) != NULL) {
-        if (entry->d_type != DT_DIR) {
-            strcpy(filePath, directoryPath);
-            strcat(filePath, "\\");
-            strcat(filePath, entry->d_name);
-            char stageState=fileStageState(filePath, repoPath);
-            char modificationState=fileModificationState(filePath, repoPath, fileDepth, stageState);
-            printf("%s %c%c\n", entry->d_name, stageState, modificationState);
-        }
-    }
-    closedir(dir);
-}
-
-char stageState(char* filePath, char* repoPath) {
+char fileStageState(char* filePath, char* repoPath) {
     char *match = strstr(filePath, repoPath);
     memmove(match, match + strlen(repoPath), strlen(match + strlen(repoPath)) + 1);
     strcat(repoPath, "\\ngit\\stagingArea");
@@ -109,3 +64,49 @@ char fileModificationState(char* filePath, char* repoPath, int fileDepth, char s
             return 'U';
     }
 }
+
+void directoryStatus() {
+    char directoryPath[MAX_PATH];
+    GetCurrentDirectory(MAX_PATH, directoryPath);
+    char repoPath[MAX_PATH];
+    FILE* reposfile=fopen("d:\\ANGP\\ngit-project\\repositories.txt","r");
+    while(fgets(repoPath, sizeof(repoPath), reposfile)!= NULL) {
+        size_t len = strlen(repoPath);
+        if (len > 0 && repoPath[len - 1] == '\n') {
+            repoPath[len - 1] = '\0';
+        }
+        char* result = strstr(directoryPath, repoPath);
+        if(result!=NULL) {
+            break;
+        } 
+    }
+    fclose(reposfile);
+
+    char dirPathcopy[MAX_PATH];
+    strcpy(dirPathcopy, directoryPath);        
+    char *match = strstr(dirPathcopy, repoPath);
+    memmove(match, match + strlen(repoPath), strlen(match + strlen(repoPath)) + 1);
+    int idx=0;
+    char* piece=strtok(dirPathcopy, "\\");
+    while(piece!=NULL) {
+        piece=strtok(NULL,"\\");
+        idx++;
+    }
+    int fileDepth=idx;
+
+    char filePath[MAX_PATH];
+    DIR *dir = opendir(directoryPath);
+    struct dirent *entry;
+    while ((entry = readdir(dir)) != NULL) {
+        if (entry->d_type != DT_DIR) {
+            strcpy(filePath, directoryPath);
+            strcat(filePath, "\\");
+            strcat(filePath, entry->d_name);
+            char stageState=fileStageState(filePath, repoPath);
+            char modificationState=fileModificationState(filePath, repoPath, fileDepth, stageState);
+            printf("%s %c%c\n", entry->d_name, stageState, modificationState);
+        }
+    }
+    closedir(dir);
+}
+

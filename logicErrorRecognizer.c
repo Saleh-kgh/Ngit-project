@@ -190,3 +190,38 @@ int resetLER(int argc, char* argv[]) {
     }
     return 1;
 }
+
+int commitLER() {
+    char currentPath[MAX_PATH];
+    GetCurrentDirectory(MAX_PATH, currentPath);
+    char repoPath[MAX_PATH];
+    FILE* reposfile=fopen("d:\\ANGP\\ngit-project\\repositories.txt","r");
+    while(fgets(repoPath, sizeof(repoPath), reposfile)!= NULL) {
+        size_t len = strlen(repoPath);
+        if (len > 0 && repoPath[len - 1] == '\n') {
+            repoPath[len - 1] = '\0';
+        }
+        char* result = strstr(currentPath, repoPath);
+        if(result!=NULL) {
+            break;
+        } 
+    }
+    fclose(reposfile);
+
+    strcat(repoPath, "\\ngit\\info\\stagedfiles.txt");
+    FILE* stagedfileptr=fopen(repoPath, "r");
+    int stagedCount=0;
+    char stagedfile[MAX_PATH];
+    while(fgets(stagedfile, sizeof(stagedfile), stagedfileptr) != NULL) {
+        size_t len = strlen(stagedfile);
+        if (len > 0 && stagedfile[len - 1] == '\n') {
+            stagedfile[len - 1] = '\0';
+        }
+        if(strlen(stagedfile)>1) stagedCount++;
+    }
+    if(stagedCount==0) {
+        printf("there is nothing in staging area to commit");
+        return 0;
+    }
+    return 1;
+}

@@ -5,4 +5,5 @@ int userInfoLER();
 int initLER();
 int addLER(int argc, char* argv[]);
 int resetLER(int argc, char* argv[]);
+int commitLER();
 #endif
