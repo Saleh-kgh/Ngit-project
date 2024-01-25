@@ -92,10 +92,16 @@ int main(int argc, char *argv[]) {
         if(argc==3) {
             addtoStage(argv[2]);
         }
-        else {
+        else if(strcmp(argv[2], "-f")==0){
             for(int i=3; i<argc; i++) {
                 addtoStage(argv[i]);
             }
+        }
+        else {
+            char *endptr;
+            long result;
+            result = strtol(argv[3], &endptr, 10);
+            stageDepth(result);
         }
     }
     else if(strcmp(argv[1], "status")==0) {

@@ -96,3 +96,95 @@ void addtoStage(char argv[]) {
     }   
     fclose(isfile);
 }
+
+void stageDepth(int depth) {
+    char currentpath[MAX_PATH];
+    GetCurrentDirectory(MAX_PATH, currentpath);
+    char repoPath[MAX_PATH];
+    FILE* reposfile=fopen("d:\\ANGP\\ngit-project\\repositories.txt", "r");
+    while(fgets(repoPath, sizeof(repoPath), reposfile)!= NULL) {
+        size_t len = strlen(repoPath);
+        if (len > 0 && repoPath[len - 1] == '\n') {
+            repoPath[len - 1] = '\0';
+        }
+        char* result = strstr(currentpath, repoPath);
+        if(result!=NULL) break;
+    }
+    fclose(reposfile);
+    char stagedfilesaddress[MAX_PATH];
+    strcpy(stagedfilesaddress, repoPath);
+    strcat(stagedfilesaddress, "\\ngit\\info\\stagedfiles.txt");
+    char maxDepthaddress[MAX_PATH];
+    strcpy(maxDepthaddress, repoPath);
+    strcat(maxDepthaddress, "\\ngit\\info\\maxDepth.txt");
+    FILE* maxDepthfile=fopen(maxDepthaddress, "r");
+    int maxDepth=0;
+    fscanf(maxDepthfile, "%d", &maxDepth);
+    fclose(maxDepthfile);
+    /////////////////////////////////////////////////
+    if(depth>=maxDepth) depth=maxDepth;
+    char contentsfileaddrress[MAX_PATH];
+    strcpy(contentsfileaddrress, repoPath);
+    strcat(contentsfileaddrress, "\\ngit\\info\\contents");
+    char contentsfileaddrresscopy[MAX_PATH];
+    strcpy(contentsfileaddrresscopy, contentsfileaddrress);    
+    for(int i=0; i<=depth; i++) {
+        strcpy(contentsfileaddrress, contentsfileaddrresscopy);
+        sprintf(contentsfileaddrress, "%s\\%d", contentsfileaddrress, i);
+        char newDirsaddress[MAX_PATH];
+        char newfilesaddress[MAX_PATH];
+        sprintf(newDirsaddress, "%s\\newDirs.txt", contentsfileaddrress);
+        sprintf(newfilesaddress, "%s\\newfiles.txt", contentsfileaddrress);
+        char existingdirectory[MAX_PATH];
+        char stagedfile[MAX_PATH];
+        int flag=0;
+        FILE* newDirsfile=fopen(newDirsaddress, "r");
+        FILE* stagedfilesptr=fopen(stagedfilesaddress, "r");
+        while(fgets(existingdirectory, sizeof(existingdirectory), newDirsfile) != NULL) {
+            size_t len = strlen(existingdirectory);
+            if (len > 0 && existingdirectory[len - 1] == '\n') {
+                existingdirectory[len - 1] = '\0';
+            }
+            printf("%s ", existingdirectory);   
+            while(fgets(stagedfile, sizeof(stagedfile), stagedfilesptr) != NULL) {
+                size_t len = strlen(stagedfile);
+                if (len > 0 && stagedfile[len - 1] == '\n') {
+                    stagedfile[len - 1] = '\0';
+                }  
+                char* result=strstr(existingdirectory, stagedfile);
+                if(result!=NULL) {
+                    printf("1\n");
+                    flag=1;
+                    break;
+                }
+            }
+            if(flag==0) printf("0\n");
+            rewind(stagedfilesptr);
+        }
+        fclose(newDirsfile);
+        char existingfile[MAX_PATH];
+        FILE* newfilesptr=fopen(newfilesaddress, "r");
+        while(fgets(existingfile, sizeof(existingfile), newfilesptr) != NULL) {
+            size_t len = strlen(existingfile);
+            if (len > 0 && existingfile[len - 1] == '\n') {
+                existingfile[len - 1] = '\0';
+            }
+            printf("%s ", existingfile);   
+            while(fgets(stagedfile, sizeof(stagedfile), stagedfilesptr) != NULL) {
+                size_t len = strlen(stagedfile);
+                if (len > 0 && stagedfile[len - 1] == '\n') {
+                    stagedfile[len - 1] = '\0';
+                }  
+                char* result=strstr(existingfile, stagedfile);
+                if(result!=NULL) {
+                    printf("1\n");
+                    flag=1;
+                    break;
+                }
+            }
+            if(flag==0) printf("0\n");
+            rewind(stagedfilesptr);
+        }
+        fclose(newfilesptr);
+    }
+}
