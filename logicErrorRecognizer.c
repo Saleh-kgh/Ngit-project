@@ -125,6 +125,7 @@ int addLER(int argc, char* argv[]) { // hanooz wildcard piadesazi nashode
 }
 
 int resetLER(int argc, char* argv[]) {
+    if(strcmp(argv[2], "-undo")==0) return 1;
     char currentPath[MAX_PATH];
     GetCurrentDirectory(MAX_PATH, currentPath);
     char repoPath[MAX_PATH];

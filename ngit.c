@@ -7,6 +7,7 @@
 #include "userinfoEditor.h"
 #include "listofcontents.h"
 #include "addtoStage.h"
+#include "resetStage.h"
 
 struct startupinfo {
     char username[50];
@@ -107,13 +108,11 @@ int main(int argc, char *argv[]) {
     else if(strcmp(argv[1], "reset")==0) {
         if(resetSER(argc, argv)==0) return 0;
         if(resetLER(argc, argv)==0) return 0;
-        else {
-            printf("delete shod");
-            return 0;
-        }
+        resetStage(argv[2]);
     }
     else if(strcmp(argv[1], "status")==0) {
         if(statusSER(argc, argv)==0) return 0;
+        directoryStatus();
     }
     else if(strcmp(argv[1], "commit")==0) {
         if(commitSER(argc, argv)==0) return 0;
