@@ -121,7 +121,6 @@ void stageDepth(int depth) {
     int maxDepth=0;
     fscanf(maxDepthfile, "%d", &maxDepth);
     fclose(maxDepthfile);
-    /////////////////////////////////////////////////
     if(depth>=maxDepth) depth=maxDepth;
     char contentsfileaddrress[MAX_PATH];
     strcpy(contentsfileaddrress, repoPath);

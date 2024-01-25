@@ -3,6 +3,7 @@
 #include <string.h>
 #include <windows.h>
 #include <dirent.h>
+#include "generalSubFunctions.h"
 
 int userInfoLER() {
     char currentPath[MAX_PATH];
@@ -121,4 +122,70 @@ int addLER(int argc, char* argv[]) { // hanooz wildcard piadesazi nashode
         }
         return 1;
     }
+}
+
+int resetLER(int argc, char* argv[]) {
+    char currentPath[MAX_PATH];
+    GetCurrentDirectory(MAX_PATH, currentPath);
+    char repoPath[MAX_PATH];
+    FILE* reposfile=fopen("d:\\ANGP\\ngit-project\\repositories.txt","r");
+    int flag=0;
+    while(fgets(repoPath, sizeof(repoPath), reposfile)!= NULL) {
+        size_t len = strlen(repoPath);
+        if (len > 0 && repoPath[len - 1] == '\n') {
+            repoPath[len - 1] = '\0';
+        }
+        char* result = strstr(currentPath, repoPath);
+        if(result!=NULL) {
+            flag=1;
+            break;
+        } 
+    }
+    fclose(reposfile);
+    if(flag==0) {
+        printf("you are not inside any of your repositories");
+        return 0;
+    }
+
+    strcat(currentPath, "\\");
+    strcat(currentPath, argv[2]);
+    FILE* fileExisits=fopen(currentPath, "r");
+    DIR* dirExsists=opendir(currentPath);
+    if(fileExisits==NULL && dirExsists==NULL) {
+        printf("this file is not inside this directory or doesn't exist in your repository");
+        return 0;
+    }
+
+    char repoPathcopy[MAX_PATH];
+    strcpy(repoPathcopy, repoPath);
+    strcat(repoPath, "\\ngit\\info\\stagedfiles.txt");
+    FILE* stagedfiles=fopen(repoPath, "r");
+    char stagedfile[MAX_PATH];
+    flag=0;
+    while(fgets(stagedfile, sizeof(stagedfile), stagedfiles)!=NULL) {
+        size_t len = strlen(stagedfile);
+        if (len > 0 && stagedfile[len - 1] == '\n') {
+            stagedfile[len - 1] = '\0';
+        }
+        char* result=strstr(currentPath, stagedfile);
+        if(result!=NULL) {
+            flag=1;
+        }
+    }
+    if(flag==0) {
+        printf("this file is not in staging area");
+        return 0;
+    }
+        
+    char *match = strstr(currentPath, repoPathcopy);
+    memmove(match, match + strlen(repoPathcopy), strlen(match + strlen(repoPathcopy)) + 1);
+    strcat(repoPathcopy, "\\ngit\\stagingArea");
+    strcat(repoPathcopy, currentPath);
+    FILE* fileisStaged=fopen(repoPathcopy, "r");
+    DIR* dirisStaged=opendir(repoPathcopy);
+    if(fileisStaged==NULL && dirisStaged==NULL) {
+        printf("this file is not in staging area");
+        return 0;
+    }
+    return 1;
 }

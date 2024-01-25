@@ -79,6 +79,18 @@ int addSER(int argc, char* argv[]) {
     return 1;
 }
 
+int resetSER(int argc, char* argv[]) {
+    int error_occured=0;
+    if(argc<3) error_occured=1;
+    else if(argc==3 && strcmp(argv[2], "-f")==0) error_occured=1;
+    else if(argc>3 && strcmp(argv[2], "-f")!=0) error_occured=1;
+    if(error_occured==1) {
+        printf("Invalid command due to misspell or extra words.");
+        return 0;
+    }
+    return 1;
+}
+
 int statusSER(int argc, char* argv[]) {
     if(argc!=2) {
         printf("Invalid command due to misspell or extra words.");

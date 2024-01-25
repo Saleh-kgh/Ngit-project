@@ -5,6 +5,7 @@ int userInfoSER(int argc, char* argv[]);
 int aliasSER(int argc, char* argv[]);
 int initSER(int argc, char* argv[]);
 int addSER(int argc, char* argv[]);
+int resetSER(int argc, char* argv[]);
 int statusSER(int argc, char* argv[]);
 int commitSER(int argc, char* argv[]);
 int setSER(int argc, char* argv[]);
