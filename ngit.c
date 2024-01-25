@@ -9,6 +9,7 @@
 #include "addtoStage.h"
 #include "resetStage.h"
 #include "directoryStatus.h"
+#include "commitCreator.h"
 
 struct startupinfo {
     char username[50];
@@ -118,6 +119,7 @@ int main(int argc, char *argv[]) {
     else if(strcmp(argv[1], "commit")==0) {
         if(commitSER(argc, argv)==0) return 0;
         if(commitLER()==0) return 0;
+        commitCreator(argv[3]);
     }
     else if(strcmp(argv[1], "set")==0) {
         if(setSER(argc, argv)==0) return 0;

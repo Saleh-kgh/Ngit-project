@@ -47,11 +47,16 @@ int makeHiddenNgitDir() {
                 //fputs("0", fptr); // tedade commit
                 fclose(fptr);
                 strcpy(currentDirectory, curDirpathCopy);
+                strcat(currentDirectory, "\\info\\lastCommit.txt");
+                FILE* fptr4=fopen(currentDirectory, "w");
+                fprintf(fptr4,"0");
+                fclose(fptr4);
+                strcpy(currentDirectory, curDirpathCopy);
                 strcat(currentDirectory, "\\info\\stagedfiles.txt");
                 FILE* fptr3=fopen(currentDirectory, "w");
                 fclose(fptr3);
                 strcpy(currentDirectory, curDirpathCopy);
-                strcat(currentDirectory, "\\info\\commithasehs.txt");
+                strcat(currentDirectory, "\\info\\commithashes.txt");
                 FILE* fptr2=fopen(currentDirectory, "w");
                 fclose(fptr2);
                 strcpy(currentDirectory, curDirpathCopy);
@@ -59,7 +64,7 @@ int makeHiddenNgitDir() {
                 CreateDirectory(currentDirectory, NULL);
                 strcat(currentDirectory, "\\master");
                 CreateDirectory(currentDirectory, NULL);
-                strcat(currentDirectory, "\\commithistory");
+                strcat(currentDirectory, "\\commits");
                 CreateDirectory(currentDirectory, NULL);
                 strcpy(currentDirectory, curDirpathCopy);
                 strcat(currentDirectory, "\\stagingArea");
