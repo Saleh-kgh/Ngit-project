@@ -40,7 +40,7 @@ void startUp() {
 }
 
 int main(int argc, char *argv[]) {
-    startUp();
+    //startUp();
     int RESreturnedValue=0;
     if(strcmp(argv[1], "config")==0) {
         if(strcmp(argv[2], "user.name")==0 || strcmp(argv[3], "user.name")==0) {
@@ -85,7 +85,7 @@ int main(int argc, char *argv[]) {
     }
     else if(strcmp(argv[1], "add")==0) {
         if(addSER(argc, argv)==0) return 0;
-        if(addLER(argc, argv)==0) return 0;
+        /*if(addLER(argc, argv)==0) return 0;*/
         /*char target='*';
         char* result=strchr(argv[2], target);
         if(result!=NULL) {
@@ -95,7 +95,7 @@ int main(int argc, char *argv[]) {
         listDirectories(0);
         listFiles(0);
         if(argc==3) {
-            addtoStage(argv[2]);
+            addtoStage(argv[2]); return 0;
         }
         else if(strcmp(argv[2], "-f")==0){
             for(int i=3; i<argc; i++) {
