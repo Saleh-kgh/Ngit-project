@@ -207,6 +207,9 @@ void stageDepth(int depth) {
     char contentsfileaddrress[MAX_PATH];
     strcpy(contentsfileaddrress, repoPath);
     strcat(contentsfileaddrress, "\\ngit\\info\\contents");
+    char oldAlladdress[MAX_PATH];
+    strcpy(oldAlladdress, repoPath);
+    strcat(oldAlladdress, "\\ngit\\info\\contents\\oldAll.txt");
     char contentsfileaddrresscopy[MAX_PATH];
     strcpy(contentsfileaddrresscopy, contentsfileaddrress);    
     for(int i=0; i<=depth; i++) {
@@ -218,31 +221,51 @@ void stageDepth(int depth) {
         sprintf(newfilesaddress, "%s\\newfiles.txt", contentsfileaddrress);
         char existingdirectory[MAX_PATH];
         char stagedfile[MAX_PATH];
-        int flag=0;
+        int flag1=0;
+        int flag2=0;
+        int flag3=0;
+        char directoryPath[MAX_PATH];
+        char dirType[5];
+        char dirModification[30];
+        char olddirectoryPath[MAX_PATH];
+        char olddirType[5];
+        char olddirModification[30];
         FILE* newDirsfile=fopen(newDirsaddress, "r");
         FILE* stagedfilesptr=fopen(stagedfilesaddress, "r");
+        FILE* oldAllptr=fopen(oldAlladdress, "r");
         while(fgets(existingdirectory, sizeof(existingdirectory), newDirsfile) != NULL) {
             size_t len = strlen(existingdirectory);
             if (len > 0 && existingdirectory[len - 1] == '\n') {
                 existingdirectory[len - 1] = '\0';
             }
             printf("%s ", existingdirectory);   
-            while(fgets(stagedfile, sizeof(stagedfile), stagedfilesptr) != NULL) {
-                size_t len = strlen(stagedfile);
-                if (len > 0 && stagedfile[len - 1] == '\n') {
-                    stagedfile[len - 1] = '\0';
-                }  
-                char* result=strstr(existingdirectory, stagedfile);
-                if(result!=NULL) {
-                    printf("1\n");
-                    flag=1;
+            while(fscanf(stagedfilesptr, "%s%s%s", directoryPath, dirType, dirModification)==3) {  
+                if(strcmp(existingdirectory, directoryPath)==0) {
+                    while(fscanf(oldAllptr, "%s%s%s", olddirectoryPath, olddirType, olddirModification)==3) {
+                        if(strcmp(existingdirectory, olddirectoryPath)==0) {
+                            if(strcmp(olddirModification, dirModification)!=0) {
+                                printf("1\n");
+                                flag1=1;
+                            }
+                            else {
+                                printf("0\n");
+                            }
+                            flag2=1;
+                            break;
+                        }
+                    }
+                    flag3=1;
                     break;
-                }
+                } 
             }
-            if(flag==0) printf("0\n");
+            if(flag1==0 && flag2==0 && flag3==1) printf("1\n");
+            if(flag1==0 && flag2==0 && flag3==0) printf("0\n");
             rewind(stagedfilesptr);
+            rewind(oldAllptr);
         }
         fclose(newDirsfile);
+        flag1=0;
+        flag2=0;
         char existingfile[MAX_PATH];
         FILE* newfilesptr=fopen(newfilesaddress, "r");
         while(fgets(existingfile, sizeof(existingfile), newfilesptr) != NULL) {
@@ -251,20 +274,26 @@ void stageDepth(int depth) {
                 existingfile[len - 1] = '\0';
             }
             printf("%s ", existingfile);   
-            while(fgets(stagedfile, sizeof(stagedfile), stagedfilesptr) != NULL) {
-                size_t len = strlen(stagedfile);
-                if (len > 0 && stagedfile[len - 1] == '\n') {
-                    stagedfile[len - 1] = '\0';
-                }  
-                char* result=strstr(existingfile, stagedfile);
-                if(result!=NULL) {
-                    printf("1\n");
-                    flag=1;
+            while(fscanf(stagedfilesptr, "%s%s%s", directoryPath, dirType, dirModification)==3) {  
+                if(strcmp(existingfile, directoryPath)==0) {
+                    while(fscanf(oldAllptr, "%s%s%s", olddirectoryPath, olddirType, olddirModification)==3) {
+                        if(strcmp(existingfile, olddirectoryPath)==0) {
+                            if(strcmp(olddirModification, dirModification)!=0) {
+                                printf("1\n");
+                                flag1=1;
+                            }
+                            flag2=1;
+                            break;
+                        }
+                    }
+                    flag3=1;
                     break;
-                }
+                } 
             }
-            if(flag==0) printf("0\n");
+            if(flag1==0 && flag2==0 && flag3==1) printf("1\n");
+            if(flag1==0 && flag2==0 && flag3==0) printf("0\n");
             rewind(stagedfilesptr);
+            rewind(oldAllptr);
         }
         fclose(newfilesptr);
     }
