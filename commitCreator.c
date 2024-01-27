@@ -39,6 +39,8 @@ void commitCreator(char* message) {
     lastCommitptr=fopen(lastCommitFilePath, "w");
     fprintf(lastCommitptr, "%d", lastCommit);
     fclose(lastCommitptr);
+
+
     FILE* currentBranchptr=fopen("d:\\ANGP\\ngit-project\\currentbranch.txt", "r");
     char currentbranch[25];
     fscanf(currentBranchptr, "%s", currentbranch);
@@ -110,6 +112,9 @@ void commitCreator(char* message) {
     char stagedfilesPath[MAX_PATH];
     strcpy(stagedfilesPath, repoPath);
     strcat(stagedfilesPath, "\\ngit\\info\\stagedfiles.txt");
+    char begstagedfilesPath[MAX_PATH];
+    strcpy(begstagedfilesPath, repoPath);
+    strcat(begstagedfilesPath, "\\ngit\\info\\begstagedfiles.txt");
     FILE* batchFile1=fopen("copyfile.bat", "w");
     fprintf(batchFile1, "@echo off\n");
     fprintf(batchFile1, "set \"sourceFile=%s\"\n", stagedfilesPath);
@@ -123,10 +128,14 @@ void commitCreator(char* message) {
     strcpy(batFile1Path, currentPath);
     strcat(batFile1Path, "\\copyfile.bat");
     if(remove(batFile1Path)!=0) printf("failed to remove batchfile1\n");
-    FILE* stagedfileptr=fopen(stagedfilesPath, "w");
-    fclose(stagedfileptr);
-    char command[256];
-    snprintf(command, sizeof(command), "rmdir /s /q \"%s\"", stagingAreapath);
-    system(command);
-    CreateDirectory(stagingAreapath, NULL);
+    char subPath0[MAX_PATH];
+    char subType0[5];
+    char subModified0[30];
+    FILE* stagedFilesptr=fopen(stagedfilesPath, "r");
+    FILE* begstagedFilesptr=fopen(begstagedfilesPath, "w");
+    while(fscanf(stagedFilesptr, "%s%s%s", subPath0, subType0, subModified0)==3) {
+        fprintf(begstagedFilesptr, "%s %s %s\n", subPath0, subType0, subModified0);
+    }
+    fclose(stagedFilesptr);
+    fclose(begstagedFilesptr);
 }

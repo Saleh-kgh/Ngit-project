@@ -90,7 +90,7 @@ void totalStatus() {
             int flag=0;
             char begstagedfilesaddress[MAX_PATH];
             strcpy(begstagedfilesaddress, repoPath);
-            strcat(begstagedfilesaddress, "\\ngit\\infi\\begstagedfiles.txt");
+            strcat(begstagedfilesaddress, "\\ngit\\info\\begstagedfiles.txt");
             FILE* begStagedptr=fopen(begstagedfilesaddress, "r");
             while(fscanf(begStagedptr,"%s%s%s", subPath1, subType1, subModified1)==3) {
                 if(strcmp(subPath0, subPath1)==0) {
@@ -104,6 +104,9 @@ void totalStatus() {
                 printf("%s +A\n", subPath0);
             }    
         }
+        exists_innew=0;
+        exists_inold=0;
+        modif_state=0;
         rewind(newAllptr);
         rewind(oldAllptr);
     }

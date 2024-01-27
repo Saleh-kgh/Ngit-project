@@ -281,11 +281,8 @@ void stageDepth(int depth) {
             printf("%s ", existingdirectory);   
             while(fscanf(stagedfilesptr, "%s%s%s", directoryPath, dirType, dirModification)==3) {  
                 if(strcmp(existingdirectory, directoryPath)==0) {
-                    //printf("%s ", directoryPath); 
                     while(fscanf(oldAllptr, "%s%s%s", olddirectoryPath, olddirType, olddirModification)==3) {
-                        if(strcmp(existingdirectory, olddirectoryPath)==0) {
-                            //printf("%s ", olddirectoryPath); 
-                            //printf("%s %s ", dirModification, olddirModification); 
+                        if(strcmp(existingdirectory, olddirectoryPath)==0) { 
                             if(strcmp(olddirModification, dirModification)!=0) {
                                 printf("1\n");
                                 flag1=1;
@@ -330,6 +327,9 @@ void stageDepth(int depth) {
                                 printf("1\n");
                                 flag1=1;
                             }
+                            else {
+                                printf("0\n");
+                            }
                             flag2=1;
                             break;
                         }
@@ -338,8 +338,12 @@ void stageDepth(int depth) {
                     break;
                 } 
             }
-            if(flag1==0 && flag2==0 && flag3==1) printf("1\n");
-            if(flag1==0 && flag2==0 && flag3==0) printf("0\n");
+            if(flag1==0 && flag2==0 && flag3==1) {
+                printf("1\n");
+            }
+            if(flag1==0 && flag2==0 && flag3==0) {
+                printf("0\n");
+            }
             flag1=0;
             flag2=0;
             flag3=0;

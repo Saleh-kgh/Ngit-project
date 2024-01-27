@@ -3,7 +3,8 @@
 
 int userInfoLER();
 int initLER();
-int addLER(int argc, char* argv[]);
+int addLER(char* argv);
 int resetLER(int argc, char* argv[]);
 int commitLER();
+int commitSetLER(char* shortcutName);
 #endif

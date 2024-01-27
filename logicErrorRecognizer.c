@@ -3,6 +3,7 @@
 #include <string.h>
 #include <windows.h>
 #include <dirent.h>
+#include <sys/stat.h>
 #include "generalSubFunctions.h"
 
 int userInfoLER() {
@@ -39,8 +40,21 @@ int initLER() {
         if (len > 0 && repoPath[len - 1] == '\n') {
             repoPath[len - 1] = '\0';
         }
+        
         char* result=strstr(currentPath, repoPath);
-        if(result!=NULL) {
+        int idx1=0;
+        char* piece1=strtok(currentPath, "\\");
+        while(piece1!=NULL) {
+            piece1=strtok(NULL,"\\");
+            idx1++;
+        }
+        int idx2=0;
+        char* piece2=strtok(repoPath, "\\");
+        while(piece2!=NULL) {
+            piece2=strtok(NULL,"\\");
+            idx2++;
+        }
+        if(result!=NULL && idx1!=idx2) {
             printf("repository initialization failed, this directory is a ngit repositiory or a subdirectory");
             return 0;
         }
@@ -49,34 +63,101 @@ int initLER() {
     return 1;
 }
 
-int addLER(int argc, char* argv[]) { // hanooz wildcard piadesazi nashode
+int addLER(char* argv) { // hanooz wildcard piadesazi nashode
     char currentPath[MAX_PATH];
     GetCurrentDirectory(MAX_PATH, currentPath);
     char repoPath[MAX_PATH];
     FILE* reposfile=fopen("d:\\ANGP\\ngit-project\\repositories.txt","r");
     int flag=0;
     while(fgets(repoPath, sizeof(repoPath), reposfile)!= NULL) {
+        flag=0;
         size_t len = strlen(repoPath);
         if (len > 0 && repoPath[len - 1] == '\n') {
             repoPath[len - 1] = '\0';
         }
         char* result = strstr(currentPath, repoPath);
         if(result!=NULL) {
-            flag=1;
-            break;
-        } 
+            char currentPath1[MAX_PATH];
+            char repoPath1[MAX_PATH];
+            strcpy(currentPath1, currentPath);
+            strcpy(repoPath1, repoPath);
+            char piecesofFilepath1[10][20];
+            char piecesofFilepath2[10][20];
+            int idx1=0;
+            char* piece1=strtok(currentPath1, "\\");
+            while(piece1!=NULL) {
+                strcpy(piecesofFilepath1[idx1], piece1);
+                piece1=strtok(NULL,"\\");
+                idx1++;
+            }
+            int idx2=0;
+            char* piece2=strtok(repoPath1, "\\");
+            while(piece2!=NULL) {
+                strcpy(piecesofFilepath2[idx2], piece2);
+                piece2=strtok(NULL,"\\");
+                idx2++;
+            }
+            for(int i=0; i<idx2; i++) {
+                if(strcmp(piecesofFilepath1[i], piecesofFilepath2[i])!=0) flag=1;
+            } 
+            if(flag==0) break;
+        }
     }
     fclose(reposfile);
-    if(flag==0) {
-        printf("you are not inside any of your repositories");
+    if(flag==1) {
+        printf("you are not inside any of your repositories\n");
         return 0;
     }
+    char newAlladdress[MAX_PATH];
+    char stagedFilesaddress[MAX_PATH];
+    strcpy(newAlladdress, repoPath);
+    strcpy(stagedFilesaddress, repoPath);
+    strcat(newAlladdress, "\\ngit\\info\\contents\\newAll.txt");
+    strcat(stagedFilesaddress, "\\ngit\\info\\stagedfiles.txt");
     strcat(repoPath, "\\ngit\\info\\stagedfiles.txt");
     FILE* stagedfiles=fopen(repoPath, "r");
     char stagedfile[MAX_PATH];
     char currentPathcopy[MAX_PATH];
     strcpy(currentPathcopy, currentPath);
-    if(argc==3) {
+    strcat(currentPath, "\\");
+    strcat(currentPath, argv);
+    FILE* fileExisits=fopen(currentPath, "r");
+    int dirFlag=0;
+    struct stat directoryInfo;
+    if (stat(currentPath, &directoryInfo) != 0) {
+    }
+    if (S_ISDIR(directoryInfo.st_mode)) {
+        dirFlag=1;
+    }
+    if(fileExisits==NULL && dirFlag==0) {
+        printf("this file <%s> is not inside this directory or doesn't exist in your repository\n", argv);
+        fclose(fileExisits);
+        return 0;
+    }
+    FILE* newAllptr=fopen(newAlladdress, "r");
+    FILE* stagedFilesptr=fopen(stagedFilesaddress, "r");
+    char subPath0[MAX_PATH];
+    char subPath1[MAX_PATH];
+    char subType0[5];
+    char subType1[5];
+    char subModified0[30];
+    char subModified1[30];
+    while(fscanf(newAllptr, "%s%s%s", subPath0, subType0, subModified0)==3) {
+        if(strcmp(subPath0, currentPath)==0) {
+            while(fscanf(stagedFilesptr, "%s%s%s", subPath1, subType1, subModified1)==3) {
+                if(strcmp(subPath0, subPath1)==0) {
+                    if(strcmp(subModified0, subModified1)==0) {
+                        printf("this file <%s> contains no recent changes to add", argv);
+                        return 0;
+                    }
+                    break;
+                }
+            }
+            break;
+        }
+    }
+    return 1;
+    /*if(argc==3) {
         strcat(currentPath, "\\");
         strcat(currentPath, argv[2]);
         FILE* fileExisits=fopen(currentPath, "r");
@@ -97,31 +178,7 @@ int addLER(int argc, char* argv[]) { // hanooz wildcard piadesazi nashode
             }
         }
         return 1;
-    }
-    else if(strcmp(argv[3],"-f")==0) {
-        for(int i=3; i<argc; i++) {
-            strcpy(currentPath, currentPathcopy);
-            strcat(currentPath, "\\");
-            strcat(currentPath, argv[i]);
-            FILE* fileExisits=fopen(currentPath, "r");
-            if(fileExisits==NULL) {
-                printf("some of your files don't exist in your repository or are in other directories");
-                return 0;
-            }
-            while(fgets(stagedfile, sizeof(stagedfile), stagedfiles)!=NULL) {
-                size_t len = strlen(repoPath);
-                if (len > 0 && repoPath[len - 1] == '\n') {
-                    repoPath[len - 1] = '\0';
-                }
-                char* result=strstr(currentPath, stagedfile);
-                if(result!=NULL) {
-                    printf("some of your files are already staged via a parent directory or themselves");
-                    return 0;
-                }
-            }
-        }
-        return 1;
-    }
+    }*/
 }
 
 int resetLER(int argc, char* argv[]) {
@@ -221,6 +278,51 @@ int commitLER() {
     }
     if(stagedCount==0) {
         printf("there is nothing in staging area to commit");
+        return 0;
+    }
+    return 1;
+}
+
+int commitSetLER(char* shortcutName) {
+    char directoryPath[MAX_PATH];
+    GetCurrentDirectory(MAX_PATH, directoryPath);
+    char repoPath[MAX_PATH];
+    FILE* reposfile=fopen("d:\\ANGP\\ngit-project\\repositories.txt","r");
+    while(fgets(repoPath, sizeof(repoPath), reposfile)!= NULL) {
+        size_t len = strlen(repoPath);
+        if (len > 0 && repoPath[len - 1] == '\n') {
+            repoPath[len - 1] = '\0';
+        }
+        char* result = strstr(directoryPath, repoPath);
+        if(result!=NULL) {
+            break;
+        } 
+    }
+    fclose(reposfile);
+    char commitsetMessagesaddress[MAX_PATH];
+    strcpy(commitsetMessagesaddress, repoPath);
+    strcat(commitsetMessagesaddress, "\\ngit\\info\\commitsetMessage.txt");
+    FILE* commitsetMessptr=fopen(commitsetMessagesaddress, "r");
+    char tempShortcut[100];
+    char tempMessage[100];
+    int flag=0;
+    while(fscanf(commitsetMessptr, "%99s", tempShortcut)==1) {
+        fgets(tempMessage, sizeof(tempMessage), commitsetMessptr);
+        size_t len1 = strlen(tempMessage);
+        if (len1 > 0 && tempMessage[len1 - 1] == '\n') {
+            tempMessage[len1 - 1] = '\0';
+        }
+        if(strcmp(tempShortcut,shortcutName)==0) {
+            flag=1;
+            break;
+        }
+    }
+    if(flag==1) {
+        if(tempMessage[0]==' ') {
+            memmove(tempMessage, tempMessage + 1, strlen(tempMessage));
+            tempMessage[strlen(tempMessage)] = '\0';
+        }
+        printf("shortcut <%s> is already assigned to <%s> message\n", shortcutName, tempMessage);
         return 0;
     }
     return 1;

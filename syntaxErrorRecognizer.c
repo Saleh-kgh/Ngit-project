@@ -14,7 +14,7 @@ int userInfoSER(int argc, char* argv[]) {
         returnValue=2;
     }
     if(error_occured==1) {
-        printf("Invalid command due to misspell or extra words.");       
+        printf("Invalid command due to misspell or extra words dash.");       
         return 0;
     }
     return returnValue;

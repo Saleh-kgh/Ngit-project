@@ -11,34 +11,22 @@
 #include "directoryStatus.h"
 #include "commitCreator.h"
 #include "totalStatus.h"
+#include "commitMesSet.h"
 
 struct startupinfo {
     char username[50];
     char useremail[100];
     char currentbranch[50];
-    char currentpath[100];
-    int repositoryCount;
 }startupInfo;
 
-void startUp() {
-    FILE* startUpfile = fopen("d:\\ANGP\\ngit-project\\startUp.txt", "r");
-    char content[100];
-    fgets(content, sizeof(content), startUpfile);
-    strcpy(startupInfo.username, content);
-    fgets(content, sizeof(content), startUpfile);
-    strcpy(startupInfo.useremail, content);
-    int lineCount=0;
-    while(fgets(content, sizeof(content), startUpfile) != NULL) {
-        lineCount++;
-        strcpy(startupInfo.currentpath, content);
-    }
-    startupInfo.repositoryCount=lineCount;
-    fclose(startUpfile);
+/*void startUp() {
+    FILE* userInfoptr = fopen("d:\\ANGP\\ngit-project\\userInfo.txt", "r");
+    fscanf(userInfoptr, "%s%s", startupInfo.username, startupInfo.useremail);
+    fclose(userInfoptr);
     FILE* branchfile=fopen("d:\\ANGP\\ngit-project\\currentbranch.txt","r");
-    fgets(content, sizeof(content), branchfile);
-    strcpy(startupInfo.currentbranch, content);
+    fscanf(branchfile, "%s", startupInfo.currentbranch);
     fclose(branchfile);
-}
+}*/
 
 int main(int argc, char *argv[]) {
     //startUp();
@@ -49,10 +37,14 @@ int main(int argc, char *argv[]) {
             if(RESreturnedValue==0) return 0;
             else if(RESreturnedValue==1) {
                 userGlobalInfoE(argc, argv, 0);
+                //startUp();
+                return 0;
             }
             else {
                 if(userInfoLER()==0) return 0;
                 userLocalInfoE(argc, argv, 0);
+                //startUp();
+                return 0;
             }
         }
         else if(strcmp(argv[2], "user.email")==0 || strcmp(argv[3], "user.email")==0) {
@@ -60,10 +52,14 @@ int main(int argc, char *argv[]) {
             if(RESreturnedValue==0) return 0; 
             else if(RESreturnedValue==1) {
                 userGlobalInfoE(argc, argv, 1);
+                //startUp();
+                return 0;
             }
             else {
                 if(userInfoLER()==0) return 0;
                 userLocalInfoE(argc, argv, 1);
+                //startUp();
+                return 0;
             }
         }
         char alias_spell[6]="alais."; 
@@ -75,6 +71,10 @@ int main(int argc, char *argv[]) {
                 if(aliasSER(argc, argv)==0) return 0;
         }    
     }
+    /*if(strlen(startupInfo.username)<2 || strlen(startupInfo.useremail)<2) {
+        printf("please edit your personal info before anythings\n");
+        return 0;
+    }*/
     else if(strcmp(argv[1], "init")==0) {
         if(initSER(argc, argv)==0) return 0;
         if(initLER()==0) return 0;
@@ -96,12 +96,15 @@ int main(int argc, char *argv[]) {
         listDirectories(0);
         listFiles(0);
         if(argc==3) {
+            if(addLER(argv[2])==0) return 0;
             addtoStage(argv[2]); return 0;
         }
         else if(strcmp(argv[2], "-f")==0){
             for(int i=3; i<argc; i++) {
+                if(addLER(argv[i])==0) continue;
                 addtoStage(argv[i]);
             }
+            return 0;
         }
         else {
             char *endptr;
@@ -129,15 +132,23 @@ int main(int argc, char *argv[]) {
         listDirectories(0);
         listFiles(0);
         commitCreator(argv[3]);
+        listDirectories(1);
+        listFiles(1);
+        listDirectories(0);
+        listFiles(0);
     }
     else if(strcmp(argv[1], "set")==0) {
         if(setSER(argc, argv)==0) return 0;
+        if(commitSetLER(argv[5])==0) return 0;
+        commitMesSet(argv[3], argv[5]); return 0;
     }
     else if(strcmp(argv[1], "replace")==0) {
         if(replaceSER(argc, argv)==0) return 0;
+        commitMesReplace(argv[3], argv[5]); return 0;
     }
     else if(strcmp(argv[1], "remove")==0) {
         if(removeSER(argc, argv)==0) return 0;
+        commitMesRemove(argv[3]); return 0;
     }
     else if(strcmp(argv[1], "log")==0) {
         if(logSER(argc, argv)==0) return 0;
