@@ -22,7 +22,7 @@ int addtoStage(char argv[]) {
     }
     fclose(reposfile);
     char repositoryPath[MAX_PATH];
-    strcpy(repositoryPath, repoPath);
+    strcpy(repositoryPath, filePath);
     char repoPathcopy2[MAX_PATH];
     strcpy(repoPathcopy2, repoPath);
     char stagedfileaddress[MAX_PATH];
@@ -34,10 +34,11 @@ int addtoStage(char argv[]) {
     char repoPathcopy[MAX_PATH];
     strcpy(repoPathcopy, filePath);
     char filePathcopy[MAX_PATH];
-    strcpy(filePathcopy, filePath);
+    strcpy(filePathcopy, repoPath);
     strcat(filePath, "\\");
     strcat(filePath, argv);
-    FILE* isfile=fopen(filePath, "r");        
+    FILE* isfile=fopen(filePath, "r"); 
+    DIR* isDir=opendir(filePath);       
     char *match = strstr(filePath, repoPath);
     memmove(match, match + strlen(repoPath), strlen(match + strlen(repoPath)) + 1);
     char piecesofFilepath[10][20]; 
@@ -55,7 +56,7 @@ int addtoStage(char argv[]) {
     FILE* allNewptr=fopen(repoPathcopy2, "r");
     FILE* stagedfilesptr=fopen(stagedfileaddress, "a");
     FILE* stagedfilesread=fopen(stagedfileaddress, "r");
-    if(isfile==NULL) {
+    if(isfile==NULL && isDir!=NULL) {
         for(int i=0; i<idx; i++) {
             strcat(repoPath, "\\");               
             strcat(repoPath, piecesofFilepath[i]); 
@@ -116,32 +117,45 @@ int addtoStage(char argv[]) {
         char subPath1[MAX_PATH];
         char subType1[5];
         char subModified1[30];
-        int flag=0;
+        int flag1=0;
+        int flag2=0;
         rewind(allNewptr);
         rewind(stagedfilesread);
         while(fscanf(allNewptr,"%s %s %s", subPath0, subType0, subModified0)==3) {
             if(strcmp(subPath0, repoPathcopy3)==0) {
                 while(fscanf(stagedfilesread,"%s %s %s", subPath1, subType1, subModified1)==3) {
                     if(strcmp(subPath1, repoPathcopy3)==0) {
-                        flag=1;
+                        flag1=1;
                         if(strcmp(subModified0, subModified1)==0) return 0;
                     }
+                }
+                flag2=1;
+            }
+        }
+        rewind(stagedfilesread);
+        if(flag2==0) {
+            while(fscanf(stagedfilesread,"%s %s %s", subPath1, subType1, subModified1)==3) {
+                if(strcmp(subPath1, repoPathcopy3)==0) {
+                    flag1=1;
+                    break;
                 }
             }
         }
         fclose(allNewptr);
-        strcat(repoPathcopy, "\\copyfile.bat");
-        FILE *batchFile=fopen(repoPathcopy, "w");
-        fprintf(batchFile, "@echo off\n");
-        fprintf(batchFile, "set \"sourceFile=%s\"\n", repoPathcopy3);
-        fprintf(batchFile, "set \"destinationFile=%s\"\n", repoPath);
-        fprintf(batchFile, ")\n");
-        fprintf(batchFile, "type \"%%sourceFile%%\" > \"%%destinationFile%%\"\n");
-        fprintf(batchFile, "exit /b 0\n");
-        fclose(batchFile);
-        system("copyfile.bat");
-        remove(repoPathcopy);
-        if(flag==1) {
+        if(flag2==1 || flag1==0) {
+            strcat(repoPathcopy, "\\copyfile.bat");
+            FILE *batchFile=fopen(repoPathcopy, "w");
+            fprintf(batchFile, "@echo off\n");
+            fprintf(batchFile, "set \"sourceFile=%s\"\n", repoPathcopy3);
+            fprintf(batchFile, "set \"destinationFile=%s\"\n", repoPath);
+            fprintf(batchFile, ")\n");
+            fprintf(batchFile, "type \"%%sourceFile%%\" > \"%%destinationFile%%\"\n");
+            fprintf(batchFile, "exit /b 0\n");
+            fclose(batchFile);
+            system("copyfile.bat");
+            remove(repoPathcopy);
+        }
+        if(flag1==1 && flag2==1) {
             FILE* newStagedFilesptr=fopen(newstagedfileaddress, "w");
             struct stat file_info2;
             stat(repoPathcopy3, &file_info2);
@@ -166,7 +180,7 @@ int addtoStage(char argv[]) {
             DeleteFile(stagedfileaddress);                                  
             rename(newstagedfileaddress, stagedfileaddress);
         }
-        else {
+        else if(flag2==1 && flag1==0){
             struct stat file_info1;
             stat(repoPathcopy3, &file_info1);
             time_t modification_time1 = file_info1.st_mtime;
@@ -174,6 +188,32 @@ int addtoStage(char argv[]) {
             strftime(modified_time_str1, sizeof(modified_time_str1), "%Y-%m-%d%H:%M:%S", localtime(&modification_time1));
             fprintf(stagedfilesptr,"%s f %s\n", repoPathcopy3, modified_time_str1);
             fclose(stagedfilesptr);
+        }
+        else if(flag2==0 && flag1==1) {
+            FILE* newStagedFilesptr=fopen(newstagedfileaddress, "w");
+            struct stat file_info2;
+            stat(repoPathcopy3, &file_info2);
+            time_t modification_time2 = file_info2.st_mtime;
+            char modified_time_str2[20];
+            strftime(modified_time_str2, sizeof(modified_time_str2), "%Y-%m-%d%H:%M:%S", localtime(&modification_time2));
+            rewind(stagedfilesread);
+            while(fscanf(stagedfilesread,"%s %s %s", subPath1, subType1, subModified1)==3) {
+                if(strcmp(subPath1, repoPathcopy3)==0) {
+                    SetFileAttributes(repoPath, FILE_ATTRIBUTE_NORMAL);
+                    DeleteFile(repoPath);
+                }
+                else {
+                    fprintf(newStagedFilesptr,"%s %s %s\n", subPath1, subType1, subModified1);
+                }
+            }
+            rewind(stagedfilesread);
+            rewind(newStagedFilesptr);
+            fclose(stagedfilesread);
+            fclose(newStagedFilesptr);
+            fclose(stagedfilesptr);
+            SetFileAttributes(stagedfileaddress, FILE_ATTRIBUTE_NORMAL);
+            DeleteFile(stagedfileaddress);                                  
+            rename(newstagedfileaddress, stagedfileaddress);
         }
     }   
     fclose(isfile);
@@ -241,8 +281,11 @@ void stageDepth(int depth) {
             printf("%s ", existingdirectory);   
             while(fscanf(stagedfilesptr, "%s%s%s", directoryPath, dirType, dirModification)==3) {  
                 if(strcmp(existingdirectory, directoryPath)==0) {
+                    //printf("%s ", directoryPath); 
                     while(fscanf(oldAllptr, "%s%s%s", olddirectoryPath, olddirType, olddirModification)==3) {
                         if(strcmp(existingdirectory, olddirectoryPath)==0) {
+                            //printf("%s ", olddirectoryPath); 
+                            //printf("%s %s ", dirModification, olddirModification); 
                             if(strcmp(olddirModification, dirModification)!=0) {
                                 printf("1\n");
                                 flag1=1;
@@ -258,14 +301,19 @@ void stageDepth(int depth) {
                     break;
                 } 
             }
-            if(flag1==0 && flag2==0 && flag3==1) printf("1\n");
-            if(flag1==0 && flag2==0 && flag3==0) printf("0\n");
+            if(flag1==0 && flag2==0 && flag3==1) {
+                printf("1\n");
+            }
+            if(flag1==0 && flag2==0 && flag3==0) {
+                printf("0\n");
+            }
+            flag1=0;
+            flag2=0;
+            flag3=0;
             rewind(stagedfilesptr);
             rewind(oldAllptr);
         }
         fclose(newDirsfile);
-        flag1=0;
-        flag2=0;
         char existingfile[MAX_PATH];
         FILE* newfilesptr=fopen(newfilesaddress, "r");
         while(fgets(existingfile, sizeof(existingfile), newfilesptr) != NULL) {
@@ -292,6 +340,9 @@ void stageDepth(int depth) {
             }
             if(flag1==0 && flag2==0 && flag3==1) printf("1\n");
             if(flag1==0 && flag2==0 && flag3==0) printf("0\n");
+            flag1=0;
+            flag2=0;
+            flag3=0;
             rewind(stagedfilesptr);
             rewind(oldAllptr);
         }

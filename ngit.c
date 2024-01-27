@@ -10,6 +10,7 @@
 #include "resetStage.h"
 #include "directoryStatus.h"
 #include "commitCreator.h"
+#include "totalStatus.h"
 
 struct startupinfo {
     char username[50];
@@ -111,7 +112,7 @@ int main(int argc, char *argv[]) {
     }
     else if(strcmp(argv[1], "reset")==0) {
         if(resetSER(argc, argv)==0) return 0;
-        if(resetLER(argc, argv)==0) return 0;
+        /*if(resetLER(argc, argv)==0) return 0;*/
         listDirectories(0);
         listFiles(0);
         resetStage(argv[2]);
@@ -120,7 +121,7 @@ int main(int argc, char *argv[]) {
         if(statusSER(argc, argv)==0) return 0;
         listDirectories(0);
         listFiles(0);
-        directoryStatus();
+        totalStatus();
     }
     else if(strcmp(argv[1], "commit")==0) {
         if(commitSER(argc, argv)==0) return 0;

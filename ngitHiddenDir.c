@@ -56,6 +56,10 @@ int makeHiddenNgitDir() {
                 FILE* fptr3=fopen(currentDirectory, "w");
                 fclose(fptr3);
                 strcpy(currentDirectory, curDirpathCopy);
+                strcat(currentDirectory, "\\info\\begstagedfiles.txt");
+                FILE* fptr5=fopen(currentDirectory, "w");
+                fclose(fptr5);
+                strcpy(currentDirectory, curDirpathCopy);
                 strcat(currentDirectory, "\\info\\commithashes.txt");
                 FILE* fptr2=fopen(currentDirectory, "w");
                 fclose(fptr2);
