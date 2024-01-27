@@ -4,23 +4,29 @@
 #include <windows.h>
 #include <dirent.h>
 
-void removeDirectory(const char* path) {
-    SHFILEOPSTRUCT fileOp = {
-        .hwnd   = NULL,
-        .wFunc  = FO_DELETE,
-        .pFrom  = path,
-        .pTo    = NULL,
-        .fFlags = FOF_NOCONFIRMATION | FOF_SILENT | FOF_NOERRORUI,
-        .fAnyOperationsAborted = FALSE,
-        .hNameMappings = NULL
-    };
+void deleteFilesAndSubdirs(const char *dirname) {
+    WIN32_FIND_DATA findFileData;
+    HANDLE hFind;
+    char path[MAX_PATH];
 
-    int result = SHFileOperation(&fileOp);
-    if (result == 0) {
-        printf("Directory '%s' successfully removed.\n", path);
-    } else {
-        printf("Error removing directory. Error code: %d\n", result);
+    snprintf(path, sizeof(path), "%s\\*.*", dirname);
+    hFind = FindFirstFile(path, &findFileData);
+    if (hFind == INVALID_HANDLE_VALUE) {
+        return;
     }
+
+    do {
+        if (strcmp(findFileData.cFileName, ".") != 0 && strcmp(findFileData.cFileName, "..") != 0) {
+            snprintf(path, sizeof(path), "%s\\%s", dirname, findFileData.cFileName);
+            if (findFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+                deleteFilesAndSubdirs(path); // Recursively delete subdirectories
+            } else {
+                remove(path); // Delete file
+            }
+        }
+    } while (FindNextFile(hFind, &findFileData) != 0);
+
+    FindClose(hFind);
 }
 
 void resetStage(char* argv) {
@@ -97,6 +103,9 @@ void resetStage(char* argv) {
     else {
         closedir(dptr);
         printf("%s\n", repoPathcopy2);
-        removeDirectory(repoPathcopy2);
+        char dirName[MAX_PATH];
+        strcpy(dirName, repoPathcopy2);
+        deleteFilesAndSubdirs(dirName);
+        RemoveDirectory(dirName);
     }                                  
 }
