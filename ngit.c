@@ -12,6 +12,7 @@
 #include "commitCreator.h"
 #include "totalStatus.h"
 #include "commitMesSet.h"
+#include "logFunctions.h"
 
 struct startupinfo {
     char username[50];
@@ -151,7 +152,37 @@ int main(int argc, char *argv[]) {
         commitMesRemove(argv[3]); return 0;
     }
     else if(strcmp(argv[1], "log")==0) {
-        if(logSER(argc, argv)==0) return 0;
+        //if(logSER(argc, argv)==0) return 0;
+        int returnValue=logLER(argc, argv);
+        if(returnValue==0) return 0;
+        if(returnValue==7) {
+            normalLog();
+            return 0;
+        }
+        if(returnValue==1) {
+            numberLog(argv[3]);
+            return 0;
+        }
+        if(returnValue==2) {
+            branchLog(argv[3]);
+            return 0;
+        }
+        if(returnValue==3) {
+            authorLog(argv[3]);
+            return 0;
+        }
+        if(returnValue==4) {
+            //sinceLog(argv[3]);
+            return 0;
+        }
+        if(returnValue==5) {
+            //beforeLog(argv[3]);
+            return 0;
+        }
+        if(returnValue==6) {
+            wordLog(argv[3]);
+            return 0;
+        } 
     }
     else if(strcmp(argv[1], "branch")==0) {
         if(branchSER(argc, argv)==0) return 0;

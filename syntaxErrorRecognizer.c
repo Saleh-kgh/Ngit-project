@@ -159,14 +159,17 @@ int removeSER(int argc, char* argv[]) {
 
 int logSER(int argc, char* argv[]) {
     int error_occured=0;
-    if(argc!=4) error_occured=1;
-    if((strcmp(argv[2], "-n")!=0) && (strcmp(argv[2], "-branch")!=0) && (strcmp(argv[2], "-author")!=0) && (strcmp(argv[2], "-since")!=0) && (strcmp(argv[2], "-before")!=0) && (strcmp(argv[2], "-search")!=0))
+    if(argc==4 || argc==2) error_occured=1;
+    if(argc==4 && (strcmp(argv[2], "-n")!=0) && (strcmp(argv[2], "-branch")!=0) && (strcmp(argv[2], "-author")!=0) && (strcmp(argv[2], "-since")!=0) && (strcmp(argv[2], "-before")!=0) && (strcmp(argv[2], "-search")!=0))
         error_occured=1;
-    int length = strlen(argv[3]);
-    for(int i=0; i<length; i++) {
-        if(argv[3][i]<48 || argv[3][i]>57) {
-            printf("Invalid command due to unacceptable number.");
-            return 0;
+    
+    if(strcmp(argv[2],"-n")==0) {
+        int length = strlen(argv[3]);
+        for(int i=0; i<length; i++) {
+            if(argv[3][i]<48 || argv[3][i]>57) {
+                printf("Invalid command due to unacceptable number.");
+                return 0;
+            }
         }
     }
     // code for invalid date of since and before

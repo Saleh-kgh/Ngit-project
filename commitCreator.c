@@ -28,9 +28,15 @@ void commitCreator(char* message) {
     totalCommmitptr=fopen("d:\\ANGP\\ngit-project\\totalCommitCount.txt", "w");
     fprintf(totalCommmitptr, "%d", totalCommit);
     fclose(totalCommmitptr);
+    FILE* currentBranchptr=fopen("d:\\ANGP\\ngit-project\\currentbranch.txt", "r");
+    char currentbranch[25];
+    fscanf(currentBranchptr, "%s", currentbranch);
+    fclose(currentBranchptr);
     char lastCommitFilePath[MAX_PATH];
     strcpy(lastCommitFilePath, repoPath);
-    strcat(lastCommitFilePath, "\\ngit\\info\\lastCommit.txt");
+    strcat(lastCommitFilePath, "\\ngit\\info\\");
+    strcat(lastCommitFilePath, currentbranch);
+    strcat(lastCommitFilePath, "lastCommit.txt");
     FILE* lastCommitptr=fopen(lastCommitFilePath, "r");
     int lastCommit=0;
     fscanf(lastCommitptr, "%d", &lastCommit);
@@ -40,11 +46,6 @@ void commitCreator(char* message) {
     fprintf(lastCommitptr, "%d", lastCommit);
     fclose(lastCommitptr);
 
-
-    FILE* currentBranchptr=fopen("d:\\ANGP\\ngit-project\\currentbranch.txt", "r");
-    char currentbranch[25];
-    fscanf(currentBranchptr, "%s", currentbranch);
-    fclose(currentBranchptr);
     char commitFolderPath[MAX_PATH];
     strcpy(commitFolderPath, repoPath);
     strcat(commitFolderPath, "\\ngit\\branches\\");
@@ -94,24 +95,65 @@ void commitCreator(char* message) {
     localTime = localtime(&currentTime);
     char* dateandTime=asctime(localTime);
     char commitDetailPath[MAX_PATH];
-    strcpy(commitDetailPath, commitFolderPath);
-    strcat(commitDetailPath, "\\commitDetail.txt");
-    FILE* commitDetailptr=fopen(commitDetailPath, "w");
-    fprintf(commitDetailptr, "%08d\n%s\n%s\n%s\n%s", totalCommit, message, username, useremail, dateandTime);
-    fclose(commitDetailptr);
-    printf("commited successfully\n%08d\n%s\n%s\n%s\n%s", totalCommit, message, username, useremail, dateandTime);
-    char commithashPath[MAX_PATH];
-    strcpy(commithashPath, repoPath);
-    strcat(commithashPath, "\\ngit\\info\\commithashes.txt");
-    FILE* commithashptr=fopen(commithashPath, "a");
-    fprintf(commithashptr, "%08d\n", totalCommit);
-    fclose(commithashptr);
-    char commitedfilesPath[MAX_PATH];
-    strcpy(commitedfilesPath, commitFolderPath);
-    strcat(commitedfilesPath, "\\commitedfiles.txt");
     char stagedfilesPath[MAX_PATH];
     strcpy(stagedfilesPath, repoPath);
     strcat(stagedfilesPath, "\\ngit\\info\\stagedfiles.txt");
+    FILE* stagedFilesptr2=fopen(stagedfilesPath, "r");
+    int countofFiles=0;
+    char subPath[MAX_PATH];
+    char subType[5];
+    char subModified[30];
+    while(fscanf(stagedFilesptr2, "%s%s%s", subPath, subType, subModified)==3) {
+        if(strcmp(subType, "f")==0) {
+            countofFiles++;
+        }
+    }
+    fclose(stagedFilesptr2);
+    strcpy(commitDetailPath, commitFolderPath); 
+    strcat(commitDetailPath, "\\commitDetail.txt");
+    FILE* commitDetailptr=fopen(commitDetailPath, "w");
+    fprintf(commitDetailptr, "%08d\n%s\n%d\n%s\n%s\n%s\n%s", totalCommit, currentbranch, countofFiles, message, username, useremail, dateandTime);
+    fclose(commitDetailptr);
+    printf("commited successfully\n%08d\n%s\n%s\n%s\n%s\n%s", totalCommit, currentbranch, message, username, useremail, dateandTime);
+    char allCommitPath[MAX_PATH];
+    strcpy(allCommitPath, repoPath);
+    strcat(allCommitPath, "\\ngit\\info\\allCommits.txt");
+    char commitHash[9];
+    char commitBranch[20];
+    char commitedFiles[6];
+    char commitMessage[80];
+    char commitAuthor[30];
+    char commitAuthorEmail[30];
+    char commitDate[30];
+    char newallCommitPath[MAX_PATH];
+    strcpy(newallCommitPath, repoPath);
+    strcat(newallCommitPath, "\\ngit\\info\\newallCommits.txt");
+    FILE* allCommitptr=fopen(allCommitPath, "r");
+    FILE* newallCommitptr=fopen(newallCommitPath, "w");
+    fprintf(newallCommitptr, "%08d\n%s\n%d\n%s\n%s\n%s\n%s", totalCommit, currentbranch, countofFiles, message, username, useremail, dateandTime);
+    char line[100];
+    char commitData[7][100];
+    while (fgets(line, sizeof(line), allCommitptr)) {
+        line[strcspn(line, "\n")] = '\0';
+        strcpy(commitData[0], line);
+        for (int i = 1; i < 7; i++) {
+            if (!fgets(line, sizeof(line), allCommitptr)) {
+                printf("Error: Unexpected end of file\n");
+                return;
+            }
+            line[strcspn(line, "\n")] = '\0';
+            strcpy(commitData[i], line);
+        }
+        fprintf(newallCommitptr, "%s\n%s\n%s\n%s\n%s\n%s\n%s\n", commitData[0], commitData[1], commitData[2], commitData[3], commitData[4], commitData[5], commitData[6]);
+    }
+    fclose(allCommitptr);
+    fclose(newallCommitptr);
+    SetFileAttributes(allCommitPath, FILE_ATTRIBUTE_NORMAL);
+    DeleteFile(allCommitPath);
+    rename(newallCommitPath, allCommitPath);
+    char commitedfilesPath[MAX_PATH];
+    strcpy(commitedfilesPath, commitFolderPath);
+    strcat(commitedfilesPath, "\\commitedfiles.txt");
     char begstagedfilesPath[MAX_PATH];
     strcpy(begstagedfilesPath, repoPath);
     strcat(begstagedfilesPath, "\\ngit\\info\\begstagedfiles.txt");

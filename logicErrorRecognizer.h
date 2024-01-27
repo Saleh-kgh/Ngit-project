@@ -7,4 +7,5 @@ int addLER(char* argv);
 int resetLER(int argc, char* argv[]);
 int commitLER();
 int commitSetLER(char* shortcutName);
+int logLER(int argc, char* argv[]);
 #endif

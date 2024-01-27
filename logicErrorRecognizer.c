@@ -327,3 +327,45 @@ int commitSetLER(char* shortcutName) {
     }
     return 1;
 }
+
+int logLER(int argc, char* argv[]) {
+    if(argc==2) return 7;
+    if(strcmp(argv[2],"-branch")==0) {
+        char directoryPath[MAX_PATH];
+        GetCurrentDirectory(MAX_PATH, directoryPath);
+        char repoPath[MAX_PATH];
+        FILE* reposfile=fopen("d:\\ANGP\\ngit-project\\repositories.txt","r");
+        while(fgets(repoPath, sizeof(repoPath), reposfile)!= NULL) {
+            size_t len = strlen(repoPath);
+            if (len > 0 && repoPath[len - 1] == '\n') {
+                repoPath[len - 1] = '\0';
+            }
+            char* result = strstr(directoryPath, repoPath);
+            if(result!=NULL) {
+                break;
+            } 
+        }
+        fclose(reposfile);
+        char branchesFilPath[MAX_PATH];
+        strcpy(branchesFilPath, repoPath);
+        strcat(branchesFilPath, "\\ngit\\info\\branches.txt");
+        FILE* branchesFileptr=fopen(branchesFilPath, "r");
+        char branch[20];
+        int flag=0;
+        while(fscanf(branchesFileptr, "%s", branch)==1) {
+            if(strcmp(branch, argv[3])==0) {
+                flag=1;
+                return 2;
+            }
+        }
+        if(flag==0) {
+            printf("branch <%s> does not exist", argv[3]);
+            return 0;
+        }
+    }
+    else if(strcmp(argv[2],"-n")==0) return 1;
+    else if(strcmp(argv[2],"-author")==0) return 3;
+    else if(strcmp(argv[2],"-since")==0) return 4;
+    else if(strcmp(argv[2],"-before")==0) return 5;
+    else if(strcmp(argv[2],"-search")==0) return 6;
+}

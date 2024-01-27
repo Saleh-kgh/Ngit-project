@@ -47,7 +47,7 @@ int makeHiddenNgitDir() {
                 //fputs("0", fptr); // tedade commit
                 fclose(fptr);
                 strcpy(currentDirectory, curDirpathCopy);
-                strcat(currentDirectory, "\\info\\lastCommit.txt");
+                strcat(currentDirectory, "\\info\\masterlastCommit.txt");
                 FILE* fptr4=fopen(currentDirectory, "w");
                 fprintf(fptr4,"0");
                 fclose(fptr4);
@@ -60,7 +60,12 @@ int makeHiddenNgitDir() {
                 FILE* fptr5=fopen(currentDirectory, "w");
                 fclose(fptr5);
                 strcpy(currentDirectory, curDirpathCopy);
-                strcat(currentDirectory, "\\info\\commithashes.txt");
+                strcat(currentDirectory, "\\info\\branches.txt");
+                FILE* fptr6=fopen(currentDirectory, "w");
+                fprintf(fptr6, "master\n");
+                fclose(fptr6);
+                strcpy(currentDirectory, curDirpathCopy);
+                strcat(currentDirectory, "\\info\\allCommits.txt");
                 FILE* fptr2=fopen(currentDirectory, "w");
                 fclose(fptr2);
                 strcpy(currentDirectory, curDirpathCopy);
