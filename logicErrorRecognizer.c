@@ -265,20 +265,52 @@ int commitLER() {
     }
     fclose(reposfile);
 
-    strcat(repoPath, "\\ngit\\info\\stagedfiles.txt");
-    FILE* stagedfileptr=fopen(repoPath, "r");
-    int stagedCount=0;
+    char stagedFielsaddress[MAX_PATH];
+    char oldAllFilesaddress[MAX_PATH];
+    char newAllFilesaddress[MAX_PATH];
+    strcpy(stagedFielsaddress, repoPath);
+    strcpy(oldAllFilesaddress, repoPath);
+    strcpy(newAllFilesaddress, repoPath);
+    strcat(stagedFielsaddress, "\\ngit\\info\\stagedfiles.txt");
+    strcat(oldAllFilesaddress, "\\ngit\\info\\contents\\oldAll.txt");
+    strcat(newAllFilesaddress, "\\ngit\\info\\contents\\newAll.txt");
+    int countStagedFiles=0;
+    int countUnmodifiedFiles=0;
+    char subPath0[MAX_PATH];
+    char subPath1[MAX_PATH];
+    char subType0[5];
+    char subType1[5];
+    char subModified0[30];
+    char subModified1[30];
+    FILE* stagedFilesptr=fopen(stagedFielsaddress, "r");
+    FILE* oldallFilesptr=fopen(oldAllFilesaddress, "r");
     char stagedfile[MAX_PATH];
-    while(fgets(stagedfile, sizeof(stagedfile), stagedfileptr) != NULL) {
-        size_t len = strlen(stagedfile);
-        if (len > 0 && stagedfile[len - 1] == '\n') {
-            stagedfile[len - 1] = '\0';
+    while(fscanf(stagedFilesptr, "%s%s%s", subPath0, subType0, subModified0)==3) {
+        countStagedFiles++;
+        while(fscanf(oldallFilesptr, "%s%s%s", subPath1, subType1, subModified1)==3) {
+            if(strcmp(subPath0, subPath1)==0) {
+                if(strcmp(subModified0, subModified1)==0) {
+                    countUnmodifiedFiles++;
+                }
+            }
         }
-        if(strlen(stagedfile)>1) stagedCount++;
     }
-    if(stagedCount==0) {
-        printf("there is nothing in staging area to commit");
+    if(countStagedFiles==countUnmodifiedFiles) {
+        printf("there isn't any modified or new file in staging area to commit\n");
         return 0;
+    }   
+    fclose(oldallFilesptr);
+    rewind(stagedFilesptr);
+    FILE* newAllFilesptr=fopen(newAllFilesaddress, "r");
+    while(fscanf(stagedFilesptr, "%s%s%s", subPath0, subType0, subModified0)==3) {
+        while(fscanf(newAllFilesptr, "%s%s%s", subPath1, subType1, subModified1)==3) {
+            if(strcmp(subPath0, subPath1)==0) {
+                if(strcmp(subModified0, subModified1)!=0) {
+                    printf("not allowed to commit, you have recently modified files <%s> not staged since recent change\n", subPath0);
+                    return 0;
+                }
+            }
+        }
     }
     return 1;
 }
