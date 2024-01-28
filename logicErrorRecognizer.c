@@ -286,6 +286,7 @@ int commitLER() {
     FILE* oldallFilesptr=fopen(oldAllFilesaddress, "r");
     char stagedfile[MAX_PATH];
     while(fscanf(stagedFilesptr, "%s%s%s", subPath0, subType0, subModified0)==3) {
+        if(strcmp(subType0, "d")==0) continue;
         countStagedFiles++;
         while(fscanf(oldallFilesptr, "%s%s%s", subPath1, subType1, subModified1)==3) {
             if(strcmp(subPath0, subPath1)==0) {
@@ -303,6 +304,7 @@ int commitLER() {
     rewind(stagedFilesptr);
     FILE* newAllFilesptr=fopen(newAllFilesaddress, "r");
     while(fscanf(stagedFilesptr, "%s%s%s", subPath0, subType0, subModified0)==3) {
+        if(strcmp(subType0, "d")==0) continue;
         while(fscanf(newAllFilesptr, "%s%s%s", subPath1, subType1, subModified1)==3) {
             if(strcmp(subPath0, subPath1)==0) {
                 if(strcmp(subModified0, subModified1)!=0) {

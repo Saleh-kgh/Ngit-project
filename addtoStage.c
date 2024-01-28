@@ -65,12 +65,16 @@ int addtoStage(char argv[]) {
             DIR* dirptr=opendir(repoPath);
             if(dirptr==NULL) {
                 CreateDirectory(repoPath, NULL);                      
-                struct stat file_info;
-                stat(repoPath, &file_info);
-                time_t modification_time = file_info.st_mtime;
-                char modified_time_str[20];
-                strftime(modified_time_str, sizeof(modified_time_str), "%Y-%m-%d%H:%M:%S", localtime(&modification_time));
-                fprintf(stagedfilesptr,"%s d %s\n", repoPathcopy3, modified_time_str);
+                char dirPath[MAX_PATH];
+                char type[5];
+                char dirModification[30];
+                while(fscanf(allNewptr, "%s%s%s", dirPath, type, dirModification)==3) {
+                    if(strcmp(dirPath, repoPathcopy3)==0) {
+                       fprintf(stagedfilesptr,"%s d %s\n", repoPathcopy3, dirModification);
+                       rewind(allNewptr); 
+                       break;
+                    }
+                }
             }    
                       
         }
@@ -99,12 +103,16 @@ int addtoStage(char argv[]) {
             DIR* dirptr=opendir(repoPath);
             if(dirptr==NULL) {
                 CreateDirectory(repoPath, NULL);
-                struct stat file_info;
-                stat(repoPath, &file_info);
-                time_t modification_time = file_info.st_mtime;
-                char modified_time_str[20];
-                strftime(modified_time_str, sizeof(modified_time_str), "%Y-%m-%d%H:%M:%S", localtime(&modification_time));
-                fprintf(stagedfilesptr,"%s d %s\n", repoPathcopy3, modified_time_str);
+                char dirPath[MAX_PATH];
+                char type[5];
+                char dirModification[30];
+                while(fscanf(allNewptr, "%s%s%s", dirPath, type, dirModification)==3) {
+                    if(strcmp(dirPath, repoPathcopy3)==0) {
+                       fprintf(stagedfilesptr,"%s d %s\n", repoPathcopy3, dirModification);
+                       rewind(allNewptr); 
+                       break;
+                    }
+                }
             }            
         }
         strcat(repoPath, "\\");
@@ -165,7 +173,7 @@ int addtoStage(char argv[]) {
             rewind(stagedfilesread);
             while(fscanf(stagedfilesread,"%s %s %s", subPath1, subType1, subModified1)==3) {
                 if(strcmp(subPath1, repoPathcopy3)==0) {
-                    fprintf(newStagedFilesptr,"%s f %s\n", repoPathcopy3, modified_time_str2);
+                    fprintf(newStagedFilesptr,"%s f %s\n", repoPathcopy3, subModified0);
                 }
                 else {
                     fprintf(newStagedFilesptr,"%s %s %s\n", subPath1, subType1, subModified1);
@@ -186,7 +194,7 @@ int addtoStage(char argv[]) {
             time_t modification_time1 = file_info1.st_mtime;
             char modified_time_str1[20];
             strftime(modified_time_str1, sizeof(modified_time_str1), "%Y-%m-%d%H:%M:%S", localtime(&modification_time1));
-            fprintf(stagedfilesptr,"%s f %s\n", repoPathcopy3, modified_time_str1);
+            fprintf(stagedfilesptr,"%s f %s\n", repoPathcopy3, subModified0);
             fclose(stagedfilesptr);
         }
         else if(flag2==0 && flag1==1) {
