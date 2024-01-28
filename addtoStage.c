@@ -64,6 +64,7 @@ int addtoStage(char argv[]) {
             strcat(repoPathcopy3, piecesofFilepath[i]);       
             DIR* dirptr=opendir(repoPath);
             if(dirptr==NULL) {
+                rewind(allNewptr);
                 CreateDirectory(repoPath, NULL);                      
                 char dirPath[MAX_PATH];
                 char type[5];
@@ -106,6 +107,7 @@ int addtoStage(char argv[]) {
                 char dirPath[MAX_PATH];
                 char type[5];
                 char dirModification[30];
+                rewind(allNewptr);
                 while(fscanf(allNewptr, "%s%s%s", dirPath, type, dirModification)==3) {
                     if(strcmp(dirPath, repoPathcopy3)==0) {
                        fprintf(stagedfilesptr,"%s d %s\n", repoPathcopy3, dirModification);

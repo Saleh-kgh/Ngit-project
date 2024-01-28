@@ -110,9 +110,12 @@ int addLER(char* argv) { // hanooz wildcard piadesazi nashode
     }
     char newAlladdress[MAX_PATH];
     char stagedFilesaddress[MAX_PATH];
+    char oldAlladdress[MAX_PATH];
     strcpy(newAlladdress, repoPath);
+    strcpy(oldAlladdress, repoPath);
     strcpy(stagedFilesaddress, repoPath);
     strcat(newAlladdress, "\\ngit\\info\\contents\\newAll.txt");
+    strcat(oldAlladdress, "\\ngit\\info\\contents\\oldAll.txt");
     strcat(stagedFilesaddress, "\\ngit\\info\\stagedfiles.txt");
     strcat(repoPath, "\\ngit\\info\\stagedfiles.txt");
     char stagedfile[MAX_PATH];
@@ -131,9 +134,9 @@ int addLER(char* argv) { // hanooz wildcard piadesazi nashode
     if(fileExisits==NULL && dirFlag==0) {
         printf("this file <%s> is not inside this directory or doesn't exist in your repository\n", argv);
         fclose(fileExisits);
-        fclose(fileExisits);
         return 0;
     }
+    fclose(fileExisits);
     FILE* newAllptr=fopen(newAlladdress, "r");
     FILE* stagedFilesptr=fopen(stagedFilesaddress, "r");
     char subPath0[MAX_PATH];
@@ -142,26 +145,57 @@ int addLER(char* argv) { // hanooz wildcard piadesazi nashode
     char subType1[5];
     char subModified0[30];
     char subModified1[30];
-    while(fscanf(newAllptr, "%s%s%s", subPath0, subType0, subModified0)==3) {
-        if(strcmp(subPath0, currentPath)==0) {
-            while(fscanf(stagedFilesptr, "%s%s%s", subPath1, subType1, subModified1)==3) {
-                if(strcmp(subPath0, subPath1)==0) {
-                    if(strcmp(subModified0, subModified1)==0) {
-                        printf("this file <%s> contains no recent changes to add", argv);
-                        fclose(fileExisits);
-                        fclose(newAllptr);
-                        fclose(stagedFilesptr);
-                        return 0;
+    int countStagedFiles=0;
+    int countUnmodifiedFiles=0;
+    FILE* fileExists=fopen(currentPath, "r");
+    FILE* oldAllptr=fopen(oldAlladdress, "r");
+    if(fileExisits!=NULL) {
+        while(fscanf(newAllptr, "%s%s%s", subPath0, subType0, subModified0)==3) {
+            if(strcmp(subPath0, currentPath)==0) {
+                while(fscanf(stagedFilesptr, "%s%s%s", subPath1, subType1, subModified1)==3) {
+                    if(strcmp(subPath0, subPath1)==0) {
+                        if(strcmp(subModified0, subModified1)==0) {
+                            printf("this file <%s> contains no recent changes to add", argv);
+                            fclose(fileExisits);
+                            fclose(newAllptr);
+                            fclose(stagedFilesptr);
+                            fclose(oldAllptr);
+                            return 0;
+                        }
+                        break;
                     }
-                    break;
                 }
+                break;
             }
-            break;
+        }
+    }
+    else {
+        while(fscanf(stagedFilesptr, "%s%s%s", subPath0, subType0, subModified0)==3) {
+            if(strstr(subPath0, currentPath)!=NULL && strcmp(subType0,"f")==0) {
+                while(fscanf(oldAllptr, "%s%s%s", subPath1, subType1, subModified1)==3) {
+                    if(strcmp(subPath1, subPath0)==0) {
+                        countStagedFiles++;
+                        if(strcmp(subModified0, subModified1)==0) {
+                            countUnmodifiedFiles++;
+                        }
+                    }
+                }
+                if(countStagedFiles==countUnmodifiedFiles) {
+                    printf("this file <%s> is not in staging area\n", argv[2]);
+                    fclose(fileExisits);
+                    fclose(newAllptr);
+                    fclose(stagedFilesptr);
+                    fclose(oldAllptr);
+                    return 0;
+                }
+                break;
+            }
         }
     }
     fclose(fileExisits);
     fclose(newAllptr);
     fclose(stagedFilesptr);
+    fclose(oldAllptr);
     return 1;
     /*if(argc==3) {
         strcat(currentPath, "\\");

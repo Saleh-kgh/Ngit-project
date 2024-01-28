@@ -14,6 +14,7 @@
 #include "commitMesSet.h"
 #include "logFunctions.h"
 #include "createBranch.h"
+#include "checkOut.h"
 
 struct startupinfo {
     char username[50];
@@ -185,10 +186,13 @@ int main(int argc, char *argv[]) {
     }
     else if(strcmp(argv[1], "branch")==0) {
         if(branchSER(argc, argv)==0) return 0;
-        createBranch(argv[2]);
+        if(argc==3) createBranch(argv[2]);
+        if(argc==2) listBranches();
+        return 0;
     }
     else if(strcmp(argv[1], "checkout")==0) {
         if(checkoutSER(argc, argv)==0) return 0;
+        checkoutBranch(argv[2]); return 0;
     }
     else {
         printf("Invalid command due to misspell or extra words!");

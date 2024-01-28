@@ -57,3 +57,27 @@ void createBranch(char* newBranch) {
     remove(batFilePath);
     return;
 }
+
+void listBranches() {
+    char filePath[MAX_PATH];
+    GetCurrentDirectory(MAX_PATH,filePath);
+    char repoPath[MAX_PATH];
+    FILE* reposfile=fopen("d:\\ANGP\\ngit-project\\repositories.txt","r");
+    while(fgets(repoPath, sizeof(repoPath), reposfile)!= NULL) {
+        size_t len = strlen(repoPath);
+        if (len > 0 && repoPath[len - 1] == '\n') {
+            repoPath[len - 1] = '\0';
+        }
+        char* result = strstr(filePath, repoPath);
+        if(result!=NULL) break;
+    }
+    fclose(reposfile);
+    char allBranchesPath[MAX_PATH];
+    sprintf(allBranchesPath, "%s\\ngit\\info\\branches.txt", repoPath);
+    FILE* allBranchesptr=fopen(allBranchesPath, "r");
+    char branch[20];
+    while(fscanf(allBranchesptr, "%s", branch)==1) {
+        printf("%s\n", branch);
+    }
+    return;
+}
