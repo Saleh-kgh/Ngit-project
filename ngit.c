@@ -111,21 +111,21 @@ int main(int argc, char *argv[]) {
             char *endptr;
             long result;
             result = strtol(argv[3], &endptr, 10);
-            stageDepth(result);
+            stageDepth(result); return 0;
         }
     }
     else if(strcmp(argv[1], "reset")==0) {
         if(resetSER(argc, argv)==0) return 0;
-        /*if(resetLER(argc, argv)==0) return 0;*/
+        if(resetLER(argc, argv)==0) return 0;
         listDirectories(0);
         listFiles(0);
-        resetStage(argv[2]);
+        resetStage(argv[2]); return 0;
     }
     else if(strcmp(argv[1], "status")==0) {
         if(statusSER(argc, argv)==0) return 0;
         listDirectories(0);
         listFiles(0);
-        totalStatus();
+        totalStatus(); return 0;
     }
     else if(strcmp(argv[1], "commit")==0) {
         if(commitSER(argc, argv)==0) return 0;
@@ -154,7 +154,7 @@ int main(int argc, char *argv[]) {
         commitMesRemove(argv[3]); return 0;
     }
     else if(strcmp(argv[1], "log")==0) {
-        //if(logSER(argc, argv)==0) return 0;
+        if(logSER(argc, argv)==0) return 0;
         int returnValue=logLER(argc, argv);
         if(returnValue==0) return 0;
         if(returnValue==7) {
@@ -173,12 +173,8 @@ int main(int argc, char *argv[]) {
             authorLog(argv[3]);
             return 0;
         }
-        if(returnValue==4) {
-            //sinceLog(argv[3]);
-            return 0;
-        }
-        if(returnValue==5) {
-            //beforeLog(argv[3]);
+        if(returnValue==4 || returnValue==5) {
+            dateLog(argv[3], returnValue-4);
             return 0;
         }
         if(returnValue==6) {

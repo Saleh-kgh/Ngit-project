@@ -4,29 +4,35 @@
 #include <windows.h>
 #include <dirent.h>
 
-void deleteFilesAndSubdirs(const char *dirname) {
-    WIN32_FIND_DATA findFileData;
-    HANDLE hFind;
-    char path[MAX_PATH];
+void deleteDirectory(const char *dirPath) {
+    DIR *directory = opendir(dirPath);
+    struct dirent *entry;
 
-    snprintf(path, sizeof(path), "%s\\*.*", dirname);
-    hFind = FindFirstFile(path, &findFileData);
-    if (hFind == INVALID_HANDLE_VALUE) {
+    if (directory == NULL) {
+        perror("Unable to open directory");
         return;
     }
 
-    do {
-        if (strcmp(findFileData.cFileName, ".") != 0 && strcmp(findFileData.cFileName, "..") != 0) {
-            snprintf(path, sizeof(path), "%s\\%s", dirname, findFileData.cFileName);
-            if (findFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
-                deleteFilesAndSubdirs(path); // Recursively delete subdirectories
+    while ((entry = readdir(directory)) != NULL) {
+        if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0) {
+            char path[1024];
+            snprintf(path, sizeof(path), "%s/%s", dirPath, entry->d_name);
+
+            if (entry->d_type == DT_DIR) {
+                deleteDirectory(path);
             } else {
-                remove(path); // Delete file
+                if (remove(path) != 0) {
+                    perror("Unable to delete file");
+                }
             }
         }
-    } while (FindNextFile(hFind, &findFileData) != 0);
+    }
 
-    FindClose(hFind);
+    closedir(directory);
+
+    if (rmdir(dirPath) != 0) {
+        perror("Unable to delete directory");
+    }
 }
 
 void resetStage(char* argv) {
@@ -83,10 +89,10 @@ void resetStage(char* argv) {
             fprintf(newstagedfiles, "%s %s %s\n", subPath0, subType0, subModified0);
         }
     }
-    fclose(stagedfiles);
-    fclose(newstagedfiles);
     SetFileAttributes(repoPath, FILE_ATTRIBUTE_NORMAL);
-    DeleteFile(repoPath);                                  
+    fclose(newstagedfiles);
+    fclose(stagedfiles);
+    remove(repoPath);
     rename(repoPathcopy1, repoPath);
 
     char *match = strstr(currentPath, repoPathcopy2);
@@ -97,15 +103,15 @@ void resetStage(char* argv) {
     DIR* dptr=opendir(repoPathcopy2);
     if(fptr!=NULL) {
         fclose(fptr);
+        closedir(dptr);
         SetFileAttributes(repoPathcopy2, FILE_ATTRIBUTE_NORMAL);
         DeleteFile(repoPathcopy2);
     }
     else {
         closedir(dptr);
-        printf("%s\n", repoPathcopy2);
+        fclose(fptr);
         char dirName[MAX_PATH];
         strcpy(dirName, repoPathcopy2);
-        deleteFilesAndSubdirs(dirName);
-        RemoveDirectory(dirName);
+        deleteDirectory(dirName);
     }                                  
 }

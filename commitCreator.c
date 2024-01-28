@@ -120,11 +120,13 @@ void commitCreator(int state, char* message) {
         useremail[len3 - 1] = '\0';
     }
     fclose(localUserptr);
-    time_t currentTime;
-    struct tm *localTime;
-    time(&currentTime);
-    localTime = localtime(&currentTime);
-    char* dateandTime=asctime(localTime);
+    time_t t;
+    struct tm *tm_info;
+    time(&t);
+    tm_info = localtime(&t);
+    char buffer[20];
+    strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", tm_info);
+    char* dateandTime=buffer;
     char commitDetailPath[MAX_PATH];
     char stagedfilesPath[MAX_PATH];
     strcpy(stagedfilesPath, repoPath);
@@ -161,7 +163,7 @@ void commitCreator(int state, char* message) {
     strcat(newallCommitPath, "\\ngit\\info\\newallCommits.txt");
     FILE* allCommitptr=fopen(allCommitPath, "r");
     FILE* newallCommitptr=fopen(newallCommitPath, "w");
-    fprintf(newallCommitptr, "%08d\n%s\n%d\n%s\n%s\n%s\n%s", totalCommit, currentbranch, countofFiles, message, username, useremail, dateandTime);
+    fprintf(newallCommitptr, "%08d\n%s\n%d\n%s\n%s\n%s\n%s\n", totalCommit, currentbranch, countofFiles, message, username, useremail, dateandTime);
     char line[100];
     char commitData[7][100];
     while (fgets(line, sizeof(line), allCommitptr)) {

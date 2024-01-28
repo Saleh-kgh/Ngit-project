@@ -115,7 +115,6 @@ int addLER(char* argv) { // hanooz wildcard piadesazi nashode
     strcat(newAlladdress, "\\ngit\\info\\contents\\newAll.txt");
     strcat(stagedFilesaddress, "\\ngit\\info\\stagedfiles.txt");
     strcat(repoPath, "\\ngit\\info\\stagedfiles.txt");
-    FILE* stagedfiles=fopen(repoPath, "r");
     char stagedfile[MAX_PATH];
     char currentPathcopy[MAX_PATH];
     strcpy(currentPathcopy, currentPath);
@@ -131,6 +130,7 @@ int addLER(char* argv) { // hanooz wildcard piadesazi nashode
     }
     if(fileExisits==NULL && dirFlag==0) {
         printf("this file <%s> is not inside this directory or doesn't exist in your repository\n", argv);
+        fclose(fileExisits);
         fclose(fileExisits);
         return 0;
     }
@@ -148,6 +148,9 @@ int addLER(char* argv) { // hanooz wildcard piadesazi nashode
                 if(strcmp(subPath0, subPath1)==0) {
                     if(strcmp(subModified0, subModified1)==0) {
                         printf("this file <%s> contains no recent changes to add", argv);
+                        fclose(fileExisits);
+                        fclose(newAllptr);
+                        fclose(stagedFilesptr);
                         return 0;
                     }
                     break;
@@ -156,6 +159,9 @@ int addLER(char* argv) { // hanooz wildcard piadesazi nashode
             break;
         }
     }
+    fclose(fileExisits);
+    fclose(newAllptr);
+    fclose(stagedFilesptr);
     return 1;
     /*if(argc==3) {
         strcat(currentPath, "\\");
@@ -204,7 +210,12 @@ int resetLER(int argc, char* argv[]) {
         printf("you are not inside any of your repositories");
         return 0;
     }
-
+    char oldAlladdress[MAX_PATH];
+    char stagedFilesaddress[MAX_PATH];
+    strcpy(oldAlladdress, repoPath);
+    strcpy(stagedFilesaddress, repoPath);
+    strcat(oldAlladdress, "\\ngit\\info\\contents\\oldAll.txt");
+    strcat(stagedFilesaddress, "\\ngit\\info\\stagedfiles.txt");
     strcat(currentPath, "\\");
     strcat(currentPath, argv[2]);
     FILE* fileExisits=fopen(currentPath, "r");
@@ -217,34 +228,76 @@ int resetLER(int argc, char* argv[]) {
     char repoPathcopy[MAX_PATH];
     strcpy(repoPathcopy, repoPath);
     strcat(repoPath, "\\ngit\\info\\stagedfiles.txt");
-    FILE* stagedfiles=fopen(repoPath, "r");
     char stagedfile[MAX_PATH];
     flag=0;
-    while(fgets(stagedfile, sizeof(stagedfile), stagedfiles)!=NULL) {
-        size_t len = strlen(stagedfile);
-        if (len > 0 && stagedfile[len - 1] == '\n') {
-            stagedfile[len - 1] = '\0';
-        }
-        char* result=strstr(currentPath, stagedfile);
-        if(result!=NULL) {
+    FILE* oldAllptr=fopen(oldAlladdress, "r");
+    FILE* stagedFilesptr=fopen(stagedFilesaddress, "r");
+    char subPath0[MAX_PATH];
+    char subPath1[MAX_PATH];
+    char subType0[5];
+    char subType1[5];
+    char subModified0[30];
+    char subModified1[30];
+    while(fscanf(stagedFilesptr, "%s%s%s", subPath1, subType1, subModified1)==3) {
+        if(strcmp(subPath1, currentPath)==0) {
             flag=1;
         }
     }
     if(flag==0) {
-        printf("this file is not in staging area");
+        printf("this file is not in staging area\n");
+        fclose(oldAllptr);
+        fclose(stagedFilesptr);
         return 0;
     }
-        
-    char *match = strstr(currentPath, repoPathcopy);
-    memmove(match, match + strlen(repoPathcopy), strlen(match + strlen(repoPathcopy)) + 1);
-    strcat(repoPathcopy, "\\ngit\\stagingArea");
-    strcat(repoPathcopy, currentPath);
-    FILE* fileisStaged=fopen(repoPathcopy, "r");
-    DIR* dirisStaged=opendir(repoPathcopy);
-    if(fileisStaged==NULL && dirisStaged==NULL) {
-        printf("this file is not in staging area");
-        return 0;
+    int countStagedFiles=0;
+    int countUnmodifiedFiles=0;
+    if(fileExisits!=NULL) {
+        while(fscanf(oldAllptr, "%s%s%s", subPath0, subType0, subModified0)==3) {
+            if(strcmp(subPath0, currentPath)==0) {
+                while(fscanf(stagedFilesptr, "%s%s%s", subPath1, subType1, subModified1)==3) {
+                    if(strcmp(subPath0, subPath1)==0) {
+                        if(strcmp(subModified0, subModified1)==0) {
+                            printf("this file <%s> is not in staging area\n", argv[2]);
+                            fclose(oldAllptr);
+                            fclose(stagedFilesptr);
+                            fclose(fileExisits);
+                            closedir(dirExsists);
+                            return 0;
+                        }
+                        break;
+                    }
+                }
+                break;
+            }
+        }
     }
+    else {
+        while(fscanf(stagedFilesptr, "%s%s%s", subPath0, subType0, subModified0)==3) {
+            if(strstr(subPath0, currentPath)!=NULL && strcmp(subType0,"f")==0) {
+                while(fscanf(oldAllptr, "%s%s%s", subPath1, subType1, subModified1)==3) {
+                    if(strcmp(subPath1, subPath0)==0) {
+                        countStagedFiles++;
+                        if(strcmp(subModified0, subModified1)==0) {
+                            countUnmodifiedFiles++;
+                        }
+                    }
+                }
+                if(countStagedFiles==countUnmodifiedFiles) {
+                    printf("this file <%s> is not in staging area\n", argv[2]);
+                    fclose(oldAllptr);
+                    fclose(stagedFilesptr);
+                    fclose(fileExisits);
+                    closedir(dirExsists);
+                    return 0;
+                }
+                break;
+            }
+        }
+    }
+    fclose(oldAllptr);
+    fclose(stagedFilesptr);
+    fclose(fileExisits);
+    closedir(dirExsists);
     return 1;
 }
 
@@ -303,18 +356,25 @@ int commitLER() {
                 }
             }
         }
-        if(dirisOld==0 && dirFound==1) return 1;
+        if(dirisOld==0 && dirFound==1) {
+            fclose(stagedFilesptr);
+            fclose(oldallFilesptr);
+            return 1;
+        }
         dirisOld=0;
         dirFound=0;
         rewind(oldallFilesptr);
     }
     if(countStagedFiles==countUnmodifiedFiles) {
         printf("there isn't any modified or new file in staging area to commit\n");
+        fclose(stagedFilesptr);
+        fclose(oldallFilesptr);
         return 0;
     }   
+    fclose(stagedFilesptr);
     fclose(oldallFilesptr);
     rewind(stagedFilesptr);
-    FILE* newAllFilesptr=fopen(newAllFilesaddress, "r");
+    /*FILE* newAllFilesptr=fopen(newAllFilesaddress, "r");
     while(fscanf(stagedFilesptr, "%s%s%s", subPath0, subType0, subModified0)==3) {
         if(strcmp(subType0, "d")==0) continue;
         while(fscanf(newAllFilesptr, "%s%s%s", subPath1, subType1, subModified1)==3) {
@@ -325,7 +385,7 @@ int commitLER() {
                 }
             }
         }
-    }
+    }*/
     return 1;
 }
 

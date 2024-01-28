@@ -160,7 +160,7 @@ int removeSER(int argc, char* argv[]) {
 
 int logSER(int argc, char* argv[]) {
     int error_occured=0;
-    if(argc==4 || argc==2) error_occured=1;
+    if(argc!=4 && argc!=2) error_occured=1;
     if(argc==4 && (strcmp(argv[2], "-n")!=0) && (strcmp(argv[2], "-branch")!=0) && (strcmp(argv[2], "-author")!=0) && (strcmp(argv[2], "-since")!=0) && (strcmp(argv[2], "-before")!=0) && (strcmp(argv[2], "-search")!=0))
         error_occured=1;
     
