@@ -6,7 +6,7 @@
 #include <time.h>
 #include <shellapi.h>
 
-void commitCreator(char* message) {
+void commitCreator(int state, char* message) {
     char currentPath[MAX_PATH];
     GetCurrentDirectory(MAX_PATH,currentPath);
     char repoPath[MAX_PATH];
@@ -20,6 +20,37 @@ void commitCreator(char* message) {
         if(result!=NULL) break;
     }
     fclose(reposfile);
+    if(state==1) {
+        int flag=0;
+        char commitsetMessagePath[MAX_PATH];
+        strcpy(commitsetMessagePath, repoPath);
+        strcat(commitsetMessagePath, "\\ngit\\info\\commitsetMessage.txt");
+        FILE* commitsetFIleptr=fopen(commitsetMessagePath, "r");
+        char shortcutName[40];
+        char shortcMessage[80];
+        while(fscanf(commitsetFIleptr, "%99s", shortcutName)==1) {
+            fgets(shortcMessage, sizeof(shortcMessage), commitsetFIleptr);
+            size_t len1 = strlen(shortcMessage);
+            if (len1 > 0 && shortcMessage[len1 - 1] == '\n') {
+                shortcMessage[len1 - 1] = '\0';
+            }
+            if(shortcMessage[0]==' ') {
+                memmove(shortcMessage, shortcMessage + 1, strlen(shortcMessage));
+                shortcMessage[strlen(shortcMessage)] = '\0';
+            }
+            if(strcmp(message, shortcutName)==0) {
+                //strcpy(message, shortcMessage);
+                message=shortcMessage;
+                flag=1;
+                break;
+            }
+        }
+        if(flag==0) {
+            printf("shortcut <%s> does not exist", message);
+            return ;
+        }
+    }
+    
     FILE* totalCommmitptr=fopen("d:\\ANGP\\ngit-project\\totalCommitCount.txt", "r");
     int totalCommit=0;
     fscanf(totalCommmitptr, "%d", &totalCommit);

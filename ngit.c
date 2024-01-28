@@ -132,11 +132,13 @@ int main(int argc, char *argv[]) {
         if(commitLER()==0) return 0;
         listDirectories(0);
         listFiles(0);
-        commitCreator(argv[3]);
+        if(commitSER(argc, argv)==2) commitCreator(1, argv[3]);
+        if(commitSER(argc, argv)==1) commitCreator(0, argv[3]);
         listDirectories(1);
         listFiles(1);
         listDirectories(0);
         listFiles(0);
+        return 0;
     }
     else if(strcmp(argv[1], "set")==0) {
         if(setSER(argc, argv)==0) return 0;

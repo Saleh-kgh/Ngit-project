@@ -101,7 +101,7 @@ int statusSER(int argc, char* argv[]) {
 
 int commitSER(int argc, char* argv[]) {
     int error_occured=0;
-    if(strcmp(argv[2], "-m")!=0) error_occured=1;
+    if(strcmp(argv[2], "-m")!=0 && strcmp(argv[2], "-s")!=0) error_occured=1;
     if(strlen(argv[3])>75) {
         printf("commit message too long.");
         return 0;
@@ -119,6 +119,7 @@ int commitSER(int argc, char* argv[]) {
         printf("Invalid command due to misspell or extra words.");
         return 0;
     }
+    if(strcmp(argv[2], "-s")==0) return 2;
     return 1;
 }
 

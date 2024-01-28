@@ -285,16 +285,28 @@ int commitLER() {
     FILE* stagedFilesptr=fopen(stagedFielsaddress, "r");
     FILE* oldallFilesptr=fopen(oldAllFilesaddress, "r");
     char stagedfile[MAX_PATH];
+    int dirisOld=0;
+    int dirFound=0;
     while(fscanf(stagedFilesptr, "%s%s%s", subPath0, subType0, subModified0)==3) {
-        if(strcmp(subType0, "d")==0) continue;
+        if(strcmp(subType0, "d")==0) {
+            dirFound=1;
+            countStagedFiles--;
+        }
         countStagedFiles++;
         while(fscanf(oldallFilesptr, "%s%s%s", subPath1, subType1, subModified1)==3) {
             if(strcmp(subPath0, subPath1)==0) {
-                if(strcmp(subModified0, subModified1)==0) {
+                if(strcmp(subModified0, subModified1)==0 && dirFound==0) {
                     countUnmodifiedFiles++;
+                }
+                if(dirFound==1) {
+                    dirisOld=1;
                 }
             }
         }
+        if(dirisOld==0 && dirFound==1) return 1;
+        dirisOld=0;
+        dirFound=0;
+        rewind(oldallFilesptr);
     }
     if(countStagedFiles==countUnmodifiedFiles) {
         printf("there isn't any modified or new file in staging area to commit\n");
