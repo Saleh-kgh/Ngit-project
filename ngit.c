@@ -13,6 +13,7 @@
 #include "totalStatus.h"
 #include "commitMesSet.h"
 #include "logFunctions.h"
+#include "createBranch.h"
 
 struct startupinfo {
     char username[50];
@@ -184,6 +185,7 @@ int main(int argc, char *argv[]) {
     }
     else if(strcmp(argv[1], "branch")==0) {
         if(branchSER(argc, argv)==0) return 0;
+        createBranch(argv[2]);
     }
     else if(strcmp(argv[1], "checkout")==0) {
         if(checkoutSER(argc, argv)==0) return 0;

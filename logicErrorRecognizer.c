@@ -365,6 +365,7 @@ int commitLER() {
         dirFound=0;
         rewind(oldallFilesptr);
     }
+    printf("%d %d\n", countStagedFiles, countUnmodifiedFiles);
     if(countStagedFiles==countUnmodifiedFiles) {
         printf("there isn't any modified or new file in staging area to commit\n");
         fclose(stagedFilesptr);

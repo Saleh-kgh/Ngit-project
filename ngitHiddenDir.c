@@ -65,6 +65,11 @@ int makeHiddenNgitDir() {
                 fprintf(fptr6, "master\n");
                 fclose(fptr6);
                 strcpy(currentDirectory, curDirpathCopy);
+                strcat(currentDirectory, "\\info\\currentbranch.txt");
+                FILE* fptr7=fopen(currentDirectory, "w");
+                fprintf(fptr7, "master\n");
+                fclose(fptr7);
+                strcpy(currentDirectory, curDirpathCopy);
                 strcat(currentDirectory, "\\info\\allCommits.txt");
                 FILE* fptr2=fopen(currentDirectory, "w");
                 fclose(fptr2);
