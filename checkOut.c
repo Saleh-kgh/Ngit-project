@@ -7,7 +7,7 @@
 #include <time.h>
 #include <sys/stat.h>
 
-void checkoutBranch(char* branchName) {
+void checkoutBranch(char* branchName, int state) {
     char filePath[MAX_PATH];
     GetCurrentDirectory(MAX_PATH,filePath);
     char repoPath[MAX_PATH];
@@ -25,9 +25,15 @@ void checkoutBranch(char* branchName) {
     char lastCommitBranPath[MAX_PATH]; sprintf(lastCommitBranPath, "%s\\ngit\\info\\%slastCommit.txt", repoPath, branchName);
     int lastCommit=0;
     FILE* lastCommitBranptr=fopen(lastCommitBranPath, "r"); fscanf(lastCommitBranptr, "%d", &lastCommit); fclose(lastCommitBranptr);
+    if(state!=0) lastCommit-=state;
     char branchLastComContPath[MAX_PATH]; sprintf(branchLastComContPath, "%s\\ngit\\branches\\%s\\commits\\%d", repoPath, branchName, lastCommit);
     char branchCommitedFilesPath[MAX_PATH]; sprintf(branchCommitedFilesPath, "%s\\commitedfiles.txt", branchLastComContPath);
     char stagedFilesPath[MAX_PATH]; sprintf(stagedFilesPath, "%s\\ngit\\info\\stagedfiles.txt", repoPath);
+    char checkoutCommithash[9];
+    char commitDetailPath[MAX_PATH]; sprintf(commitDetailPath, "%s\\commitDetail.txt", branchLastComContPath);
+    FILE* commitDetailptr=fopen(commitDetailPath, "r"); fscanf(commitDetailptr, "%s", checkoutCommithash); fclose(commitDetailptr);
+    char curCommithashPath[MAX_PATH]; sprintf(curCommithashPath, "%s\\ngit\\info\\curCommithash.txt", repoPath);
+    FILE* curCommithashptr=fopen(curCommithashPath, "w"); fprintf(curCommithashptr, "%s", checkoutCommithash); fclose(curCommithashptr);
     strcat(branchLastComContPath, "\\content");
     char tempFilePathtoCopy[MAX_PATH];
     char tempFiletypetoCopy[5];
@@ -95,4 +101,57 @@ void checkoutBranch(char* branchName) {
     char currentbranchPath[MAX_PATH]; sprintf(currentbranchPath, "%s\\ngit\\info\\currentbranch.txt", repoPath);
     FILE* curBranchptr=fopen(currentbranchPath, "w"); fprintf(curBranchptr, "%s", branchName); fclose(curBranchptr);
     return;
+}
+
+void checkoutHash(char* hash) {
+    int flag=0;
+    if(strcmp(hash, "HEAD")==0) flag=1;
+    char filePath[MAX_PATH];
+    GetCurrentDirectory(MAX_PATH,filePath);
+    char repoPath[MAX_PATH];
+    FILE* reposfile=fopen("d:\\ANGP\\ngit-project\\repositories.txt","r");
+    while(fgets(repoPath, sizeof(repoPath), reposfile)!= NULL) {
+        size_t len = strlen(repoPath);
+        if (len > 0 && repoPath[len - 1] == '\n') {
+            repoPath[len - 1] = '\0';
+        }
+        char* result = strstr(filePath, repoPath);
+        if(result!=NULL) break;
+    }
+    fclose(reposfile);
+
+    char allCommitsPath[MAX_PATH]; sprintf(allCommitsPath, "%s\\ngit\\info\\allCommits.txt", repoPath);
+    FILE* allCommitptr=fopen(allCommitsPath, "r");
+    char line[100];
+    char commitData[7][100];
+    while (fgets(line, sizeof(line), allCommitptr)) {
+        line[strcspn(line, "\n")] = '\0';
+        strcpy(commitData[0], line);
+        for (int i = 1; i < 7; i++) {
+            if (!fgets(line, sizeof(line), allCommitptr)) {
+                printf("Error: Unexpected end of file\n");
+                return;
+            }
+            line[strcspn(line, "\n")] = '\0';
+            strcpy(commitData[i], line);
+        }
+        if(strcmp(hash, commitData[0])==0 || flag==1) break;
+    }
+    char branchOfHash[20]; strcpy(branchOfHash, commitData[1]);
+    int count=0;
+    while (fgets(line, sizeof(line), allCommitptr)) {
+        line[strcspn(line, "\n")] = '\0';
+        strcpy(commitData[0], line);
+        for (int i = 1; i < 7; i++) {
+            if (!fgets(line, sizeof(line), allCommitptr)) {
+                printf("Error: Unexpected end of file\n");
+                return;
+            }
+            line[strcspn(line, "\n")] = '\0';
+            strcpy(commitData[i], line);
+        }
+        if(strcmp(hash, commitData[0])==0) break;
+        if(strcmp(branchOfHash, commitData[1])==0) count++;
+    }
+    checkoutBranch(branchOfHash, count);
 }

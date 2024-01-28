@@ -16,25 +16,53 @@
 #include "createBranch.h"
 #include "checkOut.h"
 
+int isAllowed=0;
+
 struct startupinfo {
     char username[50];
     char useremail[100];
     char currentbranch[50];
 }startupInfo;
 
-/*void startUp() {
+void startUp() {
     FILE* userInfoptr = fopen("d:\\ANGP\\ngit-project\\userInfo.txt", "r");
     fscanf(userInfoptr, "%s%s", startupInfo.username, startupInfo.useremail);
     fclose(userInfoptr);
     FILE* branchfile=fopen("d:\\ANGP\\ngit-project\\currentbranch.txt","r");
     fscanf(branchfile, "%s", startupInfo.currentbranch);
     fclose(branchfile);
-}*/
+    char filePath[MAX_PATH];
+    GetCurrentDirectory(MAX_PATH,filePath);
+    char repoPath[MAX_PATH];
+    FILE* reposfile=fopen("d:\\ANGP\\ngit-project\\repositories.txt","r");
+    while(fgets(repoPath, sizeof(repoPath), reposfile)!= NULL) {
+        size_t len = strlen(repoPath);
+        if (len > 0 && repoPath[len - 1] == '\n') {
+            repoPath[len - 1] = '\0';
+        }
+        char* result = strstr(filePath, repoPath);
+        if(result!=NULL) break;
+    }
+    fclose(reposfile);
+    char allCommitsPath[MAX_PATH]; sprintf(allCommitsPath, "%s\\ngit\\info\\allCommits.txt", repoPath);
+    FILE* allCommitptr=fopen(allCommitsPath, "r");
+    char line[100];
+    char HeadHash[9];
+    fgets(line, sizeof(line), allCommitptr);
+    line[strcspn(line, "\n")] = '\0';
+    fclose(allCommitptr);
+    strcpy(HeadHash, line);
+    char currenntHash[9];
+    char curCommithashPath[MAX_PATH]; sprintf(curCommithashPath, "%s\\ngit\\info\\curCommitHash.txt", repoPath);
+    FILE* curCommithashptr=fopen(curCommithashPath, "r"); fscanf(curCommithashptr, "%s", currenntHash); fclose(curCommithashptr);
+    if(strcmp(currenntHash, HeadHash)==0) isAllowed=1;
+}
 
 int main(int argc, char *argv[]) {
-    //startUp();
+    startUp();
+    if(isAllowed==0) printf("you are in detached HEAD state\nyou can only explore your project and use checkout commands\n");
     int RESreturnedValue=0;
-    if(strcmp(argv[1], "config")==0) {
+    if(strcmp(argv[1], "config")==0 && isAllowed==1) {
         if(strcmp(argv[2], "user.name")==0 || strcmp(argv[3], "user.name")==0) {
             RESreturnedValue = userInfoSER(argc, argv);
             if(RESreturnedValue==0) return 0;
@@ -78,7 +106,7 @@ int main(int argc, char *argv[]) {
         printf("please edit your personal info before anythings\n");
         return 0;
     }*/
-    else if(strcmp(argv[1], "init")==0) {
+    else if(strcmp(argv[1], "init")==0 && isAllowed==1) {
         if(initSER(argc, argv)==0) return 0;
         if(initLER()==0) return 0;
         makeHiddenNgitDir();
@@ -87,7 +115,7 @@ int main(int argc, char *argv[]) {
         listFiles(1);
         listFiles(0);
     }
-    else if(strcmp(argv[1], "add")==0) {
+    else if(strcmp(argv[1], "add")==0 && isAllowed==1) {
         if(addSER(argc, argv)==0) return 0;
         /*if(addLER(argc, argv)==0) return 0;*/
         /*char target='*';
@@ -116,20 +144,20 @@ int main(int argc, char *argv[]) {
             stageDepth(result); return 0;
         }
     }
-    else if(strcmp(argv[1], "reset")==0) {
+    else if(strcmp(argv[1], "reset")==0 && isAllowed==1) {
         if(resetSER(argc, argv)==0) return 0;
         if(resetLER(argc, argv)==0) return 0;
         listDirectories(0);
         listFiles(0);
         resetStage(argv[2]); return 0;
     }
-    else if(strcmp(argv[1], "status")==0) {
+    else if(strcmp(argv[1], "status")==0 && isAllowed==1) {
         if(statusSER(argc, argv)==0) return 0;
         listDirectories(0);
         listFiles(0);
         totalStatus(); return 0;
     }
-    else if(strcmp(argv[1], "commit")==0) {
+    else if(strcmp(argv[1], "commit")==0 && isAllowed==1) {
         if(commitSER(argc, argv)==0) return 0;
         if(commitLER()==0) return 0;
         listDirectories(0);
@@ -142,16 +170,16 @@ int main(int argc, char *argv[]) {
         listFiles(0);
         return 0;
     }
-    else if(strcmp(argv[1], "set")==0) {
+    else if(strcmp(argv[1], "set")==0 && isAllowed==1) {
         if(setSER(argc, argv)==0) return 0;
         if(commitSetLER(argv[5])==0) return 0;
         commitMesSet(argv[3], argv[5]); return 0;
     }
-    else if(strcmp(argv[1], "replace")==0) {
+    else if(strcmp(argv[1], "replace")==0 && isAllowed==1) {
         if(replaceSER(argc, argv)==0) return 0;
         commitMesReplace(argv[3], argv[5]); return 0;
     }
-    else if(strcmp(argv[1], "remove")==0) {
+    else if(strcmp(argv[1], "remove")==0 && isAllowed==1) {
         if(removeSER(argc, argv)==0) return 0;
         commitMesRemove(argv[3]); return 0;
     }
@@ -184,7 +212,7 @@ int main(int argc, char *argv[]) {
             return 0;
         } 
     }
-    else if(strcmp(argv[1], "branch")==0) {
+    else if(strcmp(argv[1], "branch")==0 && isAllowed==1) {
         if(branchSER(argc, argv)==0) return 0;
         if(argc==3) createBranch(argv[2]);
         if(argc==2) listBranches();
@@ -192,7 +220,10 @@ int main(int argc, char *argv[]) {
     }
     else if(strcmp(argv[1], "checkout")==0) {
         if(checkoutSER(argc, argv)==0) return 0;
-        checkoutBranch(argv[2]); return 0;
+        if(checkoutSER(argc, argv)==1) checkoutBranch(argv[2], 0);
+        else if(checkoutSER(argc, argv)==2) checkoutHash(argv[2]); 
+        else if(checkoutSER(argc, argv)==3) checkoutHash(argv[2]); 
+        return 0;
     }
     else {
         printf("Invalid command due to misspell or extra words!");
