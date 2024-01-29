@@ -67,25 +67,32 @@ void resetStage(char* argv) {
     char subType1[5];
     char subModified0[30];
     char subModified1[30];
+    char stagedResetPath[MAX_PATH];
     if(strcmp(argv, "-undo")==0) {
-        while(fscanf(stagedfiles, "%s%s%s", subPath0, subType0, subModified0)==3) {
-            strcpy(lastStagedfile, subPath0);
+        char lastStagedPath[MAX_PATH]; strcpy(lastStagedPath, repoPathcopy2); strcat(lastStagedPath, "\\ngit\\info\\lasStaged.txt");
+        char lastStagedremPath[MAX_PATH]; strcpy(lastStagedremPath, repoPathcopy2); strcat(lastStagedremPath, "\\ngit\\info\\remlasStaged.txt");
+        FILE* lastStagedptr=fopen(lastStagedPath, "r");  fscanf(lastStagedptr, "%s", stagedResetPath);
+        FILE* lastStagedremptr=fopen(lastStagedremPath, "w");
+        char tempLastStaged[MAX_PATH];
+        while(fscanf(lastStagedptr, "%s", tempLastStaged)==1) {
+            fprintf(lastStagedremptr, "%s\n", tempLastStaged);
         }
-        char repoPathcopy3[MAX_PATH];
-        strcpy(repoPathcopy3, repoPathcopy2);
-        strcat(repoPathcopy3, "\\");
-        char *match = strstr(lastStagedfile, repoPathcopy3);
-        memmove(match, match + strlen(repoPathcopy3), strlen(match + strlen(repoPathcopy3)) + 1);
-        strcpy(argv, lastStagedfile);
-        rewind(stagedfiles);
+        fclose(lastStagedptr); fclose(lastStagedremptr);
+        SetFileAttributes(lastStagedPath, FILE_ATTRIBUTE_NORMAL);
+        DeleteFile(lastStagedPath);                                  
+        rename(lastStagedremPath, lastStagedPath);
     }
-    strcat(currentPath, "\\");
-    strcat(currentPath, argv);
+    else {
+        strcpy(stagedResetPath, currentPath);
+        strcat(stagedResetPath, "\\");
+        strcat(stagedResetPath, argv);
+    }
+
     char needlePath[MAX_PATH];
-    strcpy(needlePath, currentPath);
+    strcpy(needlePath, stagedResetPath);
     strcat(needlePath, "\\");
     while(fscanf(stagedfiles, "%s%s%s", subPath0, subType0, subModified0)==3) {
-        if(strstr(subPath0, needlePath)==NULL && strcmp(currentPath, subPath0)!=0) {
+        if(strstr(subPath0, needlePath)==NULL && strcmp(stagedResetPath, subPath0)!=0) {
             fprintf(newstagedfiles, "%s %s %s\n", subPath0, subType0, subModified0);
         }
     }
@@ -95,10 +102,10 @@ void resetStage(char* argv) {
     remove(repoPath);
     rename(repoPathcopy1, repoPath);
 
-    char *match = strstr(currentPath, repoPathcopy2);
+    char *match = strstr(stagedResetPath, repoPathcopy2);
     memmove(match, match + strlen(repoPathcopy2), strlen(match + strlen(repoPathcopy2)) + 1);
     strcat(repoPathcopy2, "\\ngit\\stagingArea");
-    strcat(repoPathcopy2, currentPath);
+    strcat(repoPathcopy2, stagedResetPath);
     FILE* fptr=fopen(repoPathcopy2, "r");
     DIR* dptr=opendir(repoPathcopy2);
     if(fptr!=NULL) {

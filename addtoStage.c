@@ -7,6 +7,8 @@
 #include <time.h>
 #include <sys/stat.h>
 
+int static firstAdd=0;
+
 int addtoStage(char argv[]) {
     char filePath[MAX_PATH];
     GetCurrentDirectory(MAX_PATH,filePath);
@@ -21,6 +23,23 @@ int addtoStage(char argv[]) {
         if(result!=NULL) break;
     }
     fclose(reposfile);
+    if(firstAdd==0) {
+        char lastStagedPath[MAX_PATH]; strcpy(lastStagedPath, repoPath); strcat(lastStagedPath, "\\ngit\\info\\lasStaged.txt");
+        char lastStagedaddPath[MAX_PATH]; strcpy(lastStagedaddPath, repoPath); strcat(lastStagedaddPath, "\\ngit\\info\\lasStagedadd.txt");
+        FILE* lastStagedptr=fopen(lastStagedPath, "r"); FILE* lastStagedaddptr=fopen(lastStagedaddPath, "w"); 
+        fprintf(lastStagedaddptr, "%s\\%s\n", filePath, argv);
+        char tempLastStaged[MAX_PATH];
+        while(fscanf(lastStagedptr, "%s", tempLastStaged)==1) {
+            fprintf(lastStagedaddptr, "%s\n", tempLastStaged);
+        }
+        fclose(lastStagedptr);
+        fclose(lastStagedaddptr);
+        SetFileAttributes(lastStagedPath, FILE_ATTRIBUTE_NORMAL);
+        DeleteFile(lastStagedPath);                                  
+        rename(lastStagedaddPath, lastStagedPath);
+        firstAdd=1;
+    }
+    
     char repositoryPath[MAX_PATH];
     strcpy(repositoryPath, filePath);
     char repoPathcopy2[MAX_PATH];
@@ -88,7 +107,7 @@ int addtoStage(char argv[]) {
         char subModified[30];
         int round=0;
         while(fscanf(allNewptr,"%s%s%s", subPath, subType, subModified)==3) {
-            if(strstr(subPath, repoPathcopy3)!=NULL) {
+            if(strstr(subPath, repoPathcopy3)!=NULL && strcmp(subType, "f")==0) {
                 char *match = strstr(subPath, repositoryPath);
                 memmove(match, match + strlen(repositoryPath), strlen(match + strlen(repositoryPath)) + 1);
                 addtoStage(subPath);           

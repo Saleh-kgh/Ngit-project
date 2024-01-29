@@ -137,8 +137,10 @@ void checkoutHash(char* hash) {
         }
         if(strcmp(hash, commitData[0])==0 || flag==1) break;
     }
+    if(flag==1) hash=commitData[0];
     char branchOfHash[20]; strcpy(branchOfHash, commitData[1]);
     int count=0;
+    rewind(allCommitptr);
     while (fgets(line, sizeof(line), allCommitptr)) {
         line[strcspn(line, "\n")] = '\0';
         strcpy(commitData[0], line);
