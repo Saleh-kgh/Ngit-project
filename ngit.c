@@ -60,9 +60,9 @@ void startUp() {
 
 int main(int argc, char *argv[]) {
     startUp();
-    if(isAllowed==0) printf("you are in detached HEAD state\nyou can only explore your project and use checkout commands\n");
+    //if(isAllowed==0) printf("you are in detached HEAD state\nyou can only explore your project and use checkout commands\n");
     int RESreturnedValue=0;
-    if(strcmp(argv[1], "config")==0 && isAllowed==1) {
+    if(strcmp(argv[1], "config")==0 ) {
         if(strcmp(argv[2], "user.name")==0 || strcmp(argv[3], "user.name")==0) {
             RESreturnedValue = userInfoSER(argc, argv);
             if(RESreturnedValue==0) return 0;
@@ -106,7 +106,7 @@ int main(int argc, char *argv[]) {
         printf("please edit your personal info before anythings\n");
         return 0;
     }*/
-    else if(strcmp(argv[1], "init")==0 && isAllowed==1) {
+    else if(strcmp(argv[1], "init")==0 ) {
         if(initSER(argc, argv)==0) return 0;
         if(initLER()==0) return 0;
         makeHiddenNgitDir();
@@ -115,7 +115,7 @@ int main(int argc, char *argv[]) {
         listFiles(1);
         listFiles(0);
     }
-    else if(strcmp(argv[1], "add")==0 && isAllowed==1) {
+    else if(strcmp(argv[1], "add")==0 ) {
         if(addSER(argc, argv)==0) return 0;
         /*if(addLER(argc, argv)==0) return 0;*/
         /*char target='*';
@@ -144,20 +144,20 @@ int main(int argc, char *argv[]) {
             stageDepth(result); return 0;
         }
     }
-    else if(strcmp(argv[1], "reset")==0 && isAllowed==1) {
+    else if(strcmp(argv[1], "reset")==0 ) {
         if(resetSER(argc, argv)==0) return 0;
         if(resetLER(argc, argv)==0) return 0;
         listDirectories(0);
         listFiles(0);
         resetStage(argv[2]); return 0;
     }
-    else if(strcmp(argv[1], "status")==0 && isAllowed==1) {
+    else if(strcmp(argv[1], "status")==0 ) {
         if(statusSER(argc, argv)==0) return 0;
         listDirectories(0);
         listFiles(0);
         totalStatus(); return 0;
     }
-    else if(strcmp(argv[1], "commit")==0 && isAllowed==1) {
+    else if(strcmp(argv[1], "commit")==0 ) {
         if(commitSER(argc, argv)==0) return 0;
         if(commitLER()==0) return 0;
         listDirectories(0);
@@ -170,16 +170,16 @@ int main(int argc, char *argv[]) {
         listFiles(0);
         return 0;
     }
-    else if(strcmp(argv[1], "set")==0 && isAllowed==1) {
+    else if(strcmp(argv[1], "set")==0 ) {
         if(setSER(argc, argv)==0) return 0;
         if(commitSetLER(argv[5])==0) return 0;
         commitMesSet(argv[3], argv[5]); return 0;
     }
-    else if(strcmp(argv[1], "replace")==0 && isAllowed==1) {
+    else if(strcmp(argv[1], "replace")==0 ) {
         if(replaceSER(argc, argv)==0) return 0;
         commitMesReplace(argv[3], argv[5]); return 0;
     }
-    else if(strcmp(argv[1], "remove")==0 && isAllowed==1) {
+    else if(strcmp(argv[1], "remove")==0 ) {
         if(removeSER(argc, argv)==0) return 0;
         commitMesRemove(argv[3]); return 0;
     }
@@ -212,17 +212,18 @@ int main(int argc, char *argv[]) {
             return 0;
         } 
     }
-    else if(strcmp(argv[1], "branch")==0 && isAllowed==1) {
+    else if(strcmp(argv[1], "branch")==0 ) {
         if(branchSER(argc, argv)==0) return 0;
         if(argc==3) createBranch(argv[2]);
         if(argc==2) listBranches();
         return 0;
     }
     else if(strcmp(argv[1], "checkout")==0) {
-        if(checkoutSER(argc, argv)==0) return 0;
-        if(checkoutSER(argc, argv)==1) checkoutBranch(argv[2], 0);
-        else if(checkoutSER(argc, argv)==2) checkoutHash(argv[2]); 
-        else if(checkoutSER(argc, argv)==3) checkoutHash(argv[2]); 
+        int returnedVale=checkoutSER(argc, argv);
+        if(returnedVale==0) return 0;
+        if(returnedVale==1) checkoutBranch(argv[2], 0);
+        else if(returnedVale==2) checkoutHash(argv[2]); 
+        else if(returnedVale==3) checkoutHash(argv[2]); 
         return 0;
     }
     else {

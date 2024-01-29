@@ -203,9 +203,17 @@ int checkoutSER(int argc, char* argv[]) {
     }
     if(i==4) {
         if(strlen(argv[2])==4)
-            return 2;
-        return 3;
+            return 3;
     }
+    if(strlen(argv[2])==8) {
+        for(int i=0; i<8; i++) {
+            if(argv[2][i]<48 || argv[2][i]>57) {
+                return 1;
+            }
+        }
+        return 2;
+    }
+    
     if(error_occured==1) {
         printf("Invalid command due to misspell or extra words.");
         return 0;

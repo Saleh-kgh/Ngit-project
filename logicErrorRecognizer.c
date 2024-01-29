@@ -355,12 +355,15 @@ int commitLER() {
     char stagedFielsaddress[MAX_PATH];
     char oldAllFilesaddress[MAX_PATH];
     char newAllFilesaddress[MAX_PATH];
+    char begstagedFilesaddress[MAX_PATH];
     strcpy(stagedFielsaddress, repoPath);
     strcpy(oldAllFilesaddress, repoPath);
     strcpy(newAllFilesaddress, repoPath);
+    strcpy(begstagedFilesaddress, repoPath);
     strcat(stagedFielsaddress, "\\ngit\\info\\stagedfiles.txt");
     strcat(oldAllFilesaddress, "\\ngit\\info\\contents\\oldAll.txt");
     strcat(newAllFilesaddress, "\\ngit\\info\\contents\\newAll.txt");
+    strcat(begstagedFilesaddress, "\\ngit\\info\\begstagedfiles.txt");
     int countStagedFiles=0;
     int countUnmodifiedFiles=0;
     char subPath0[MAX_PATH];
@@ -369,11 +372,30 @@ int commitLER() {
     char subType1[5];
     char subModified0[30];
     char subModified1[30];
+    int flagOfAdded=0;
     FILE* stagedFilesptr=fopen(stagedFielsaddress, "r");
+    FILE* begstagedFIlesptr=fopen(begstagedFilesaddress, "r");
+    while(fscanf(stagedFilesptr, "%s%s%s", subPath0, subType0, subModified0)==3) {
+        while(fscanf(begstagedFIlesptr, "%s%s%s", subPath1, subType1, subModified1)==3) {
+            if(strcmp(subPath0, subPath1)==0) {
+                if(strcmp(subModified0, subModified1)==0) {
+                   flagOfAdded=1;
+                    break; 
+                } 
+            }
+        }
+        if(flagOfAdded==0) {
+            return 1;
+        }
+        flagOfAdded=0;
+        rewind(begstagedFIlesptr);
+    }
+    fclose(begstagedFIlesptr);
     FILE* oldallFilesptr=fopen(oldAllFilesaddress, "r");
     char stagedfile[MAX_PATH];
     int dirisOld=0;
     int dirFound=0;
+    rewind(stagedFilesptr);
     while(fscanf(stagedFilesptr, "%s%s%s", subPath0, subType0, subModified0)==3) {
         if(strcmp(subType0, "d")==0) {
             dirFound=1;
@@ -399,7 +421,6 @@ int commitLER() {
         dirFound=0;
         rewind(oldallFilesptr);
     }
-    printf("%d %d\n", countStagedFiles, countUnmodifiedFiles);
     if(countStagedFiles==countUnmodifiedFiles) {
         printf("there isn't any modified or new file in staging area to commit\n");
         fclose(stagedFilesptr);
