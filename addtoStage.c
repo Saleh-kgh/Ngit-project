@@ -156,9 +156,11 @@ int addtoStage(char argv[]) {
                     if(strcmp(subPath1, repoPathcopy3)==0) {
                         flag1=1;
                         if(strcmp(subModified0, subModified1)==0) return 0;
+                        break;
                     }
                 }
                 flag2=1;
+                break;
             }
         }
         rewind(stagedfilesread);
@@ -186,11 +188,6 @@ int addtoStage(char argv[]) {
         }
         if(flag1==1 && flag2==1) {
             FILE* newStagedFilesptr=fopen(newstagedfileaddress, "w");
-            struct stat file_info2;
-            stat(repoPathcopy3, &file_info2);
-            time_t modification_time2 = file_info2.st_mtime;
-            char modified_time_str2[20];
-            strftime(modified_time_str2, sizeof(modified_time_str2), "%Y-%m-%d%H:%M:%S", localtime(&modification_time2));
             rewind(stagedfilesread);
             while(fscanf(stagedfilesread,"%s %s %s", subPath1, subType1, subModified1)==3) {
                 if(strcmp(subPath1, repoPathcopy3)==0) {
@@ -210,21 +207,12 @@ int addtoStage(char argv[]) {
             rename(newstagedfileaddress, stagedfileaddress);
         }
         else if(flag2==1 && flag1==0){
-            struct stat file_info1;
-            stat(repoPathcopy3, &file_info1);
-            time_t modification_time1 = file_info1.st_mtime;
-            char modified_time_str1[20];
-            strftime(modified_time_str1, sizeof(modified_time_str1), "%Y-%m-%d%H:%M:%S", localtime(&modification_time1));
+            stagedfilesptr=fopen(stagedfileaddress, "a");
             fprintf(stagedfilesptr,"%s f %s\n", repoPathcopy3, subModified0);
             fclose(stagedfilesptr);
         }
         else if(flag2==0 && flag1==1) {
             FILE* newStagedFilesptr=fopen(newstagedfileaddress, "w");
-            struct stat file_info2;
-            stat(repoPathcopy3, &file_info2);
-            time_t modification_time2 = file_info2.st_mtime;
-            char modified_time_str2[20];
-            strftime(modified_time_str2, sizeof(modified_time_str2), "%Y-%m-%d%H:%M:%S", localtime(&modification_time2));
             rewind(stagedfilesread);
             while(fscanf(stagedfilesread,"%s %s %s", subPath1, subType1, subModified1)==3) {
                 if(strcmp(subPath1, repoPathcopy3)==0) {
