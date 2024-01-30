@@ -249,3 +249,22 @@ int revertSER(int argc, char* argv[]) {
     }
     return 2;
 }
+
+int tagSER(int argc, char* argv[]) {
+    if(strcmp(argv[2], "-a")!=0) return 0;
+    if(argc==4) return 1;
+    else if(argc==5 || argc<4 || argc>9) return 0;
+    else if(argc==6) {
+        if(strcmp(argv[4], "-m")==0) return 2;
+        if(strcmp(argv[4], "-c")==0) return 3;
+    }
+    else if(argc==7) {
+        if(strcmp(argv[4], "-m")==0 && strcmp(argv[6], "-f")==0) return 5;
+        if(strcmp(argv[4], "-c")==0 && strcmp(argv[6], "-f")==0) return 6;
+    }
+    else if(argc==8) {
+        if(strcmp(argv[4], "-m")==0 && strcmp(argv[6], "-c")==0) return 4;
+    }
+    else if(strcmp(argv[4], "-m")==0 && strcmp(argv[6], "-c")==0 && strcmp(argv[8], "-f")==0) return 7;
+    return 0;
+}

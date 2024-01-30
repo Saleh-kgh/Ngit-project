@@ -16,6 +16,7 @@
 #include "createBranch.h"
 #include "checkOut.h"
 #include "revertCommit.h"
+#include "createTag.h"
 
 int isAllowed=0;
 
@@ -252,9 +253,38 @@ int main(int argc, char *argv[]) {
         }
         return 0;
     }
-    else {
-        printf("Invalid command due to misspell or extra words!");
+    else if(strcmp(argv[1], "tag")==0) {
+        int returnValue=tagSER(argc, argv);
+        switch (returnValue) {
+            case 0:
+                printf("invalid command due to misspell or extra words\n");
+                break;
+            case 1:
+                createTag(argv[3], "no message", "null", 1);
+                break;
+            case 2:
+                createTag(argv[3], argv[5], "null", 2);
+                break;
+            case 3:
+                createTag(argv[3], "no message", argv[5], 3);
+                break;
+            case 4:
+                createTag(argv[3], argv[5], argv[7], 4);
+                break;
+            case 5:
+                createTag(argv[3], argv[5], "null", 5);
+                break;
+            case 6:
+                createTag(argv[3], "no message", argv[5], 6);
+                break;
+            case 7:
+                createTag(argv[3], argv[5], argv[7], 7);
+                break;
+        }
+        return 0;
     }
-
+    else {
+        printf("Invalid command due to misspell or extra words\n");
+    }
     return 0;
 }
