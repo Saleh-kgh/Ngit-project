@@ -7,6 +7,27 @@
 #include <time.h>
 #include <sys/stat.h>
 
+void deleterofDirectory(const char *dirPath) {
+    DIR *directory = opendir(dirPath);
+    struct dirent *entry;
+
+    while ((entry = readdir(directory)) != NULL) {
+        if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0) {
+            char path[1024];
+            snprintf(path, sizeof(path), "%s/%s", dirPath, entry->d_name);
+
+            if (entry->d_type == DT_DIR) {
+                deleterofDirectory(path);
+            } else {
+                remove(path) != 0;
+            }
+        }
+    }
+
+    closedir(directory);
+    rmdir(dirPath);
+}
+
 void checkoutBranch(char* branchName, int state) {
     char filePath[MAX_PATH];
     GetCurrentDirectory(MAX_PATH,filePath);
@@ -24,11 +45,26 @@ void checkoutBranch(char* branchName, int state) {
 
     char lastCommitBranPath[MAX_PATH]; sprintf(lastCommitBranPath, "%s\\ngit\\info\\%slastCommit.txt", repoPath, branchName);
     int lastCommit=0;
-    FILE* lastCommitBranptr=fopen(lastCommitBranPath, "r"); fscanf(lastCommitBranptr, "%d", &lastCommit); fclose(lastCommitBranptr);
+    FILE* lastCommitBranptr=fopen(lastCommitBranPath, "r"); 
+    if(lastCommitBranptr==NULL) {
+        printf("branch <%s> does not exist\n", branchName); return;
+    }
+    fscanf(lastCommitBranptr, "%d", &lastCommit); fclose(lastCommitBranptr);
     if(state!=0) lastCommit-=state;
     char branchLastComContPath[MAX_PATH]; sprintf(branchLastComContPath, "%s\\ngit\\branches\\%s\\commits\\%d", repoPath, branchName, lastCommit);
     char branchCommitedFilesPath[MAX_PATH]; sprintf(branchCommitedFilesPath, "%s\\commitedfiles.txt", branchLastComContPath);
     char stagedFilesPath[MAX_PATH]; sprintf(stagedFilesPath, "%s\\ngit\\info\\stagedfiles.txt", repoPath);
+    FILE* stagedFilesptr=fopen(stagedFilesPath, "r"); char tempsubFile[MAX_PATH]; char tempType[5]; char tempModif[25];
+    while(fscanf(stagedFilesptr, "%s%s%s", tempsubFile, tempType, tempModif)==3) {
+        if(strcmp(tempType, "d")==0) {
+            deleterofDirectory(tempsubFile);
+        }
+        else {
+            SetFileAttributes(tempsubFile, FILE_ATTRIBUTE_NORMAL);
+            DeleteFile(tempsubFile);
+        }
+    }
+    fclose(stagedFilesptr);
     char checkoutCommithash[9];
     char commitDetailPath[MAX_PATH]; sprintf(commitDetailPath, "%s\\commitDetail.txt", branchLastComContPath);
     FILE* commitDetailptr=fopen(commitDetailPath, "r"); fscanf(commitDetailptr, "%s", checkoutCommithash); fclose(commitDetailptr);
@@ -119,11 +155,11 @@ void checkoutHash(char* hash) {
         if(result!=NULL) break;
     }
     fclose(reposfile);
-
     char allCommitsPath[MAX_PATH]; sprintf(allCommitsPath, "%s\\ngit\\info\\allCommits.txt", repoPath);
     FILE* allCommitptr=fopen(allCommitsPath, "r");
     char line[100];
     char commitData[7][100];
+    int hashExists=0;
     while (fgets(line, sizeof(line), allCommitptr)) {
         line[strcspn(line, "\n")] = '\0';
         strcpy(commitData[0], line);
@@ -135,7 +171,14 @@ void checkoutHash(char* hash) {
             line[strcspn(line, "\n")] = '\0';
             strcpy(commitData[i], line);
         }
-        if(strcmp(hash, commitData[0])==0 || flag==1) break;
+        if(strcmp(hash, commitData[0])==0 || flag==1) {
+            hashExists=1;
+            break;
+        }
+    }
+    if(hashExists==0) {
+        printf("invalid hash\n");
+        return;
     }
     if(flag==1) hash=commitData[0];
     char branchOfHash[20]; strcpy(branchOfHash, commitData[1]);
@@ -155,5 +198,6 @@ void checkoutHash(char* hash) {
         if(strcmp(hash, commitData[0])==0) break;
         if(strcmp(branchOfHash, commitData[1])==0) count++;
     }
+    fclose(allCommitptr);
     checkoutBranch(branchOfHash, count);
 }

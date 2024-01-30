@@ -276,7 +276,7 @@ void dateLog(char* targetDate, int state) {
         char* dateString = commitData[6];
         Date inputDate = parseDate(dateString);
         int returnValue=compareDates(inputDate, constDate);
-        if( (returnValue<=1 && returnValue>-1 && state==1)||(-2<returnValue && returnValue<1 && state==0) ) {
+        if( (returnValue<2 && returnValue>-1 && state==1)||(-2<returnValue && returnValue<1 && state==0) ) {
             printf("commit hash: %s\non branch: %s\nnumber of files commited: %s\ncommit message: %s\nauthor: %s\nemail of author: %s\ndate commited: %s\n////////////////////////////////////////////////\n"
             , commitData[0], commitData[1], commitData[2], commitData[3], commitData[4], commitData[5], commitData[6]);
         }

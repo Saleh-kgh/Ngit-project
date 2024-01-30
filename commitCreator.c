@@ -14,7 +14,7 @@ void commitCreator(int state, char* message) {
     while(fgets(repoPath, sizeof(repoPath), reposfile)!= NULL) {
         size_t len1 = strlen(repoPath);
         if (len1 > 0 && repoPath[len1 - 1] == '\n') {
-            repoPath[len1 - 1] = '\0';
+            repoPath[len1 - 1] = '\\'; repoPath[len1]='\0';
         }
         char* result = strstr(currentPath, repoPath);
         if(result!=NULL) break;
@@ -59,6 +59,8 @@ void commitCreator(int state, char* message) {
     totalCommmitptr=fopen("d:\\ANGP\\ngit-project\\totalCommitCount.txt", "w");
     fprintf(totalCommmitptr, "%d", totalCommit);
     fclose(totalCommmitptr);
+    char curCommithashPath[MAX_PATH]; sprintf(curCommithashPath, "%s\\ngit\\info\\curCommithash.txt", repoPath);
+    FILE* curCommithashptr=fopen(curCommithashPath, "w"); fprintf(curCommithashptr, "%08d", totalCommit); fclose(curCommithashptr);
     FILE* currentBranchptr=fopen("d:\\ANGP\\ngit-project\\currentbranch.txt", "r");
     char currentbranch[25];
     fscanf(currentBranchptr, "%s", currentbranch);
@@ -76,6 +78,8 @@ void commitCreator(int state, char* message) {
     lastCommitptr=fopen(lastCommitFilePath, "w");
     fprintf(lastCommitptr, "%d", lastCommit);
     fclose(lastCommitptr);
+    char lasStagedPath[MAX_PATH]; sprintf(lasStagedPath, "%s\\ngit\\info\\lastStaged.txt", repoPath);
+    FILE* lasStagedptr=fopen(lasStagedPath, "w"); fclose(lasStagedptr);
 
     char commitFolderPath[MAX_PATH];
     strcpy(commitFolderPath, repoPath);

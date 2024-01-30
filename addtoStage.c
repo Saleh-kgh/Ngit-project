@@ -24,8 +24,8 @@ int addtoStage(char argv[]) {
     }
     fclose(reposfile);
     if(firstAdd==0) {
-        char lastStagedPath[MAX_PATH]; strcpy(lastStagedPath, repoPath); strcat(lastStagedPath, "\\ngit\\info\\lasStaged.txt");
-        char lastStagedaddPath[MAX_PATH]; strcpy(lastStagedaddPath, repoPath); strcat(lastStagedaddPath, "\\ngit\\info\\lasStagedadd.txt");
+        char lastStagedPath[MAX_PATH]; strcpy(lastStagedPath, repoPath); strcat(lastStagedPath, "\\ngit\\info\\lastStaged.txt");
+        char lastStagedaddPath[MAX_PATH]; strcpy(lastStagedaddPath, repoPath); strcat(lastStagedaddPath, "\\ngit\\info\\lastStagedadd.txt");
         FILE* lastStagedptr=fopen(lastStagedPath, "r"); FILE* lastStagedaddptr=fopen(lastStagedaddPath, "w"); 
         fprintf(lastStagedaddptr, "%s\\%s\n", filePath, argv);
         char tempLastStaged[MAX_PATH];

@@ -15,6 +15,7 @@
 #include "logFunctions.h"
 #include "createBranch.h"
 #include "checkOut.h"
+#include "revertCommit.h"
 
 int isAllowed=0;
 
@@ -127,12 +128,12 @@ int main(int argc, char *argv[]) {
         listDirectories(0);
         listFiles(0);
         if(argc==3) {
-            if(addLER(argv[2])==0) return 0;
+            //if(addLER(argv[2])==0) return 0;
             addtoStage(argv[2]); return 0;
         }
         else if(strcmp(argv[2], "-f")==0){
             for(int i=3; i<argc; i++) {
-                if(addLER(argv[i])==0) continue;
+                //if(addLER(argv[i])==0) continue;
                 addtoStage(argv[i]);
             }
             return 0;
@@ -207,7 +208,7 @@ int main(int argc, char *argv[]) {
             dateLog(argv[3], returnValue-4);
             return 0;
         }
-        if(returnValue==6) {
+        if(returnValue==5) {
             wordLog(argv[3]);
             return 0;
         } 
@@ -224,6 +225,31 @@ int main(int argc, char *argv[]) {
         if(returnedVale==1) checkoutBranch(argv[2], 0);
         else if(returnedVale==2) checkoutHash(argv[2]); 
         else if(returnedVale==3) checkoutHash(argv[2]); 
+        return 0;
+    }
+    else if(strcmp(argv[1], "revert")==0) {
+        int returnValue=revertSER(argc, argv);
+        switch (returnValue) {
+            case 0:
+                printf("Invalid command due to misspell or extra words!");
+                break;
+            case 1:
+                revertCommit(argv[2], "nuull", returnValue);
+                break;
+            case 2:
+                checkoutHash(argv[3]);
+                commitCreator(0, argv[2]);
+                break;
+            case 3:
+                revertCommit(argv[2], "nuull", returnValue);
+                break;
+            case 4:
+                revertCommit(argv[3], "null", returnValue);
+                break;
+            case 5:
+                revertCommit(argv[3], argv[2], returnValue);
+                break;
+        }
         return 0;
     }
     else {

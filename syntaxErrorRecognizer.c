@@ -160,6 +160,7 @@ int removeSER(int argc, char* argv[]) {
 
 int logSER(int argc, char* argv[]) {
     int error_occured=0;
+    if(argc==2) return 6;
     if(argc!=4 && argc!=2) error_occured=1;
     if(argc==4 && (strcmp(argv[2], "-n")!=0) && (strcmp(argv[2], "-branch")!=0) && (strcmp(argv[2], "-author")!=0) && (strcmp(argv[2], "-since")!=0) && (strcmp(argv[2], "-before")!=0) && (strcmp(argv[2], "-search")!=0))
         error_occured=1;
@@ -178,7 +179,12 @@ int logSER(int argc, char* argv[]) {
         printf("Invalid command due to misspell or extra words.");
         return 0;
     }
-    return 1;
+    if(argc==2) return 6;
+    if(strcmp(argv[2], "-n")==0) return 1;
+    else if(strcmp(argv[2], "-branch")==0) return 2;
+    else if(strcmp(argv[2], "-author")==0) return 3;
+    else if(strcmp(argv[2], "-since")==0 || strcmp(argv[2], "-before")==0) return 4;
+    else if(strcmp(argv[2], "-search")==0) return 5;
 }
 
 int branchSER(int argc, char* argv[]) {
@@ -219,4 +225,27 @@ int checkoutSER(int argc, char* argv[]) {
         return 0;
     }
     return 1;
+}
+
+int revertSER(int argc, char* argv[]) {
+    if(argc==3) {
+        if(strstr(argv[2], "HEAD-")!=NULL) {
+            int len=strlen(argv[2]);
+            for(int i=5; i<len; i++) {
+                if(argv[2][i]<48 || argv[2][i]>57) return 0;
+            }
+        return 3;
+        } 
+        else return 1;
+    }
+    if(argc!=4) return 0;
+    if(strcmp(argv[2], "-n")==0)  return 4;
+    if(strstr(argv[3], "HEAD-")!=NULL) {
+        int len=strlen(argv[3]);
+        for(int i=5; i<len; i++) {
+            if(argv[3][i]<48 || argv[3][i]>57) return 0;
+        }
+        return 5;
+    }
+    return 2;
 }
