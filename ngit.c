@@ -17,6 +17,7 @@
 #include "checkOut.h"
 #include "revertCommit.h"
 #include "createTag.h"
+#include "grepWord.h"
 
 int isAllowed=0;
 
@@ -279,6 +280,27 @@ int main(int argc, char *argv[]) {
                 break;
             case 7:
                 createTag(argv[3], argv[5], argv[7], 7);
+                break;
+        }
+        return 0;
+    }
+    else if(strcmp(argv[1], "grep")==0) {
+        int returnedVale=grepSER(argc, argv);
+        switch (returnedVale) {
+            case 0:
+                printf("invalid command due to misspell or extra words\n");
+                break;
+            case 1:
+                grepWord(argv[3], argv[5], "null", 1);
+                break;
+            case 2:
+                grepWord(argv[3], argv[5], argv[7], 2);
+                break;
+            case 3:
+                grepWord(argv[3], argv[5], "null", 3);
+                break;
+            case 4:
+                grepWord(argv[3], argv[5], argv[7], 4);
                 break;
         }
         return 0;

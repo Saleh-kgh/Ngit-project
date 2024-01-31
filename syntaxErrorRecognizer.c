@@ -268,3 +268,11 @@ int tagSER(int argc, char* argv[]) {
     else if(strcmp(argv[4], "-m")==0 && strcmp(argv[6], "-c")==0 && strcmp(argv[8], "-f")==0) return 7;
     return 0;
 }
+
+int grepSER(int argc, char* argv[]) {
+    if(argc<6 || argc>9) return 0;
+    if(argc==6 && strcmp(argv[2], "-f")==0 && strcmp(argv[4], "-p")==0) return 1;
+    if(argc==7 && strcmp(argv[2], "-f")==0 && strcmp(argv[4], "-p")==0 && strcmp(argv[6], "-n")==0) return 3;
+    if(argc==8 && strcmp(argv[2], "-f")==0 && strcmp(argv[4], "-p")==0 && strcmp(argv[6], "-c")==0) return 2;
+    if(argc==9 && strcmp(argv[2], "-f")==0 && strcmp(argv[4], "-p")==0 && strcmp(argv[6], "-c")==0 && strcmp(argv[8], "-n")==0) return 4;
+}

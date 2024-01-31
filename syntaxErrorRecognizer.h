@@ -16,4 +16,5 @@ int branchSER(int argc, char* argv[]);
 int checkoutSER(int argc, char* argv[]);
 int revertSER(int argc, char* argv[]);
 int tagSER(int argc, char* argv[]);
+int grepSER(int argc, char* argv[]);
 #endif
