@@ -251,8 +251,9 @@ int revertSER(int argc, char* argv[]) {
 }
 
 int tagSER(int argc, char* argv[]) {
-    if(strcmp(argv[2], "-a")!=0) return 0;
-    if(argc==4) return 1;
+    if(argc==2) return 8;
+    else if(argc==4 && strcmp(argv[2], "show")==0) return 9;
+    else if(argc==4 && strcmp(argv[2], "-a")==0) return 1;
     else if(argc==5 || argc<4 || argc>9) return 0;
     else if(argc==6) {
         if(strcmp(argv[4], "-m")==0) return 2;
@@ -275,4 +276,56 @@ int grepSER(int argc, char* argv[]) {
     if(argc==7 && strcmp(argv[2], "-f")==0 && strcmp(argv[4], "-p")==0 && strcmp(argv[6], "-n")==0) return 3;
     if(argc==8 && strcmp(argv[2], "-f")==0 && strcmp(argv[4], "-p")==0 && strcmp(argv[6], "-c")==0) return 2;
     if(argc==9 && strcmp(argv[2], "-f")==0 && strcmp(argv[4], "-p")==0 && strcmp(argv[6], "-c")==0 && strcmp(argv[8], "-n")==0) return 4;
+}
+
+int diffSER(int argc, char* argv[]) {
+    if(argc<5) return 0;
+    if(argc==5 && strcmp(argv[2], "-c")==0) return 1;
+    if(strcmp(argv[2], "-f")==0) {
+        if(argc==5) return 2;
+        if(argc==8) {
+            if(strcmp(argv[5], "-line1")==0) {
+                int len1=strlen(argv[6]);
+                for(int i=0; i<len1; i++) {
+                    if(argv[6][i]<48 || argv[6][i]>57) return 0;
+                }
+                int len2=strlen(argv[7]);
+                for(int i=0; i<len2; i++) {
+                    if(argv[7][i]<48 || argv[7][i]>57) return 0;
+                }
+                return 3;
+            }
+            else if(strcmp(argv[5], "-line2")==0) {
+                int len1=strlen(argv[6]);
+                for(int i=0; i<len1; i++) {
+                    if(argv[6][i]<48 || argv[6][i]>57) return 0;
+                }
+                int len2=strlen(argv[7]);
+                for(int i=0; i<len2; i++) {
+                    if(argv[7][i]<48 || argv[7][i]>57) return 0;
+                }
+                return 4;
+            }
+        }
+        if(argc==11 && strcmp(argv[5], "-line1")==0 && strcmp(argv[8], "-line2")==0) {
+            int len1=strlen(argv[6]);
+            for(int i=0; i<len1; i++) {
+                if(argv[6][i]<48 || argv[6][i]>57) return 0;
+            }
+            int len2=strlen(argv[7]);
+            for(int i=0; i<len2; i++) {
+                if(argv[7][i]<48 || argv[7][i]>57) return 0;
+            }
+            int len3=strlen(argv[9]);
+            for(int i=0; i<len3; i++) {
+                if(argv[9][i]<48 || argv[9][i]>57) return 0;
+            }
+            int len4=strlen(argv[7]);
+            for(int i=0; i<len4; i++) {
+                if(argv[10][i]<48 || argv[10][i]>57) return 0;
+            }
+            return 5;
+        }
+    }
+    return 0;
 }

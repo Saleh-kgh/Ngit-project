@@ -18,6 +18,8 @@
 #include "revertCommit.h"
 #include "createTag.h"
 #include "grepWord.h"
+#include"diffCheck.h"
+#include "conflictThreat.h"
 
 int isAllowed=0;
 
@@ -281,6 +283,12 @@ int main(int argc, char *argv[]) {
             case 7:
                 createTag(argv[3], argv[5], argv[7], 7);
                 break;
+            case 8:
+                tagsListShow();
+                break;
+            case 9:
+                tagIDShow(argv[3]);
+                break;
         }
         return 0;
     }
@@ -302,6 +310,32 @@ int main(int argc, char *argv[]) {
             case 4:
                 grepWord(argv[3], argv[5], argv[7], 4);
                 break;
+        }
+        return 0;
+    }
+    else if(strcmp(argv[1], "diff")==0) {
+        int returnValue=diffSER(argc, argv);
+        if(returnValue==0) {
+            printf("Invalid command due to misspell or extra words\n");
+        }
+        else if(returnValue==1) {
+            conflictThreat(argv[3], argv[4], 0);
+        } 
+        else if(returnValue==2) {
+            differenceCheck(argv[3], argv[4],1,1000000,1,1000000, 1);
+        } 
+        else if(returnValue==3) {
+            int line1Beg1=atoi(argv[6]); int line1End1=atoi(argv[7]);
+            differenceCheck(argv[3], argv[4],line1Beg1,line1End1,1,1000000, 1);
+        } 
+        else if(returnValue==4) {
+            int line2Beg1=atoi(argv[6]); int line2End1=atoi(argv[7]);
+            differenceCheck(argv[3], argv[4],1,1000000, line2Beg1,line2End1, 1);
+        } 
+        else if(returnValue==5) {
+            int line1Beg2=atoi(argv[6]); int line1End2=atoi(argv[7]);
+            int line2Beg2=atoi(argv[9]); int line2End2=atoi(argv[10]);
+            differenceCheck(argv[3], argv[4],line1Beg2,line1End2,line2Beg2,line2End2, 1);
         }
         return 0;
     }
