@@ -39,7 +39,6 @@ void commitCreator(int state, char* message) {
                 shortcMessage[strlen(shortcMessage)] = '\0';
             }
             if(strcmp(message, shortcutName)==0) {
-                //strcpy(message, shortcMessage);
                 message=shortcMessage;
                 flag=1;
                 break;

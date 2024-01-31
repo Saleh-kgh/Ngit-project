@@ -20,6 +20,7 @@
 #include "grepWord.h"
 #include"diffCheck.h"
 #include "conflictThreat.h"
+#include "mergeCommit.h"
 
 int isAllowed=0;
 
@@ -337,6 +338,10 @@ int main(int argc, char *argv[]) {
             int line2Beg2=atoi(argv[9]); int line2End2=atoi(argv[10]);
             differenceCheck(argv[3], argv[4],line1Beg2,line1End2,line2Beg2,line2End2, 1);
         }
+        return 0;
+    }
+    else if(strcmp(argv[1], "merge")==0 && strcmp(argv[2], "-b")==0) {
+        mergeCommit(argv[3], argv[4]);
         return 0;
     }
     else {

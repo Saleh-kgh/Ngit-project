@@ -51,7 +51,7 @@ void createTag(char* tagName, char* tagMessage, char* commitHash, int state) {
             }
         }
         if(flag==0) {
-            printf("the commit hash <%s> in invalid\n", commitHash);
+            printf("the commit hash <%s> is invalid\n", commitHash);
             return;
         }
     }

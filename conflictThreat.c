@@ -67,7 +67,7 @@ void conflictThreat(char* commit1Hash, char* commit2Hash, int state) {
         }
     }
     if(flag1==0) {
-        printf("the commit hash <%s> in invalid\n", commit1Hash);
+        printf("the commit hash <%s> is invalid\n", commit1Hash);
         return;
     }
     flag1=0;
@@ -90,7 +90,7 @@ void conflictThreat(char* commit1Hash, char* commit2Hash, int state) {
         }
     }
     if(flag1==0) {
-        printf("the commit hash <%s> in invalid\n", commit2Hash);
+        printf("the commit hash <%s> is invalid\n", commit2Hash);
         return;
     }
     int count1=lastCommitFinder(commit1Branch, commit1Hash, repoPath); int count2=lastCommitFinder(commit2Branch, commit2Hash, repoPath);
