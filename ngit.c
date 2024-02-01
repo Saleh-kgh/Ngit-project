@@ -21,6 +21,7 @@
 #include"diffCheck.h"
 #include "conflictThreat.h"
 #include "mergeCommit.h"
+#include "stash.h"
 
 int isAllowed=0;
 
@@ -289,6 +290,35 @@ int main(int argc, char *argv[]) {
                 break;
             case 9:
                 tagIDShow(argv[3]);
+                break;
+        }
+        return 0;
+    }
+    else if(strcmp(argv[1], "stash")==0) {
+        int returnValue=stashSER(argc, argv);
+        switch (returnValue) {
+            case 0:
+                printf("invalid command due to misspell or extra words\n");
+                break;
+            case 1:
+                stashCreator("no message");
+                break;
+            case 2:
+                stashCreator(argv[3]);
+                break;
+            case 3:
+                stashList();
+                break;
+            case 4:
+                stashPop("empty", 1);
+                break;
+            case 5:
+                stashPop(argv[3], 1);
+                break;
+            case 6:
+                stashClear();
+            case 7:
+                stashShow(argv[3]);
                 break;
         }
         return 0;

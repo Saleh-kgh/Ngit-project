@@ -46,11 +46,13 @@ int differenceCheck(char* file1Path, char* file2Path, int line1Beg, int line1End
             file2Line[strcspn(file2Line, "\n")]='\0';
             if(strcmp(file2Line, "")==0) continue;
             if(strcmp(file1Line, file2Line)!=0) {
-                if(beginflag==0) {
+                if(beginflag==0 && state!=2) {
                     printf("<<<<<<<<<<\n");
                     beginflag=1;
                 }
-                printf("%s-line %d:\n", file1NameLastPiece, line1Counter);
+                
+                if(state!=2) printf("%s-line: %d\n", file1NameLastPiece, line1Counter);
+                if(state!=3) printf("<<<<<%s>>>>>\nline: %d\n", file1Path, line1Counter);
                 HANDLE hConsole1 = GetStdHandle(STD_OUTPUT_HANDLE);
                 CONSOLE_SCREEN_BUFFER_INFO consoleInfo1;
                 WORD savedAttributes1;
@@ -59,7 +61,8 @@ int differenceCheck(char* file1Path, char* file2Path, int line1Beg, int line1End
                 SetConsoleTextAttribute(hConsole1, FOREGROUND_GREEN | FOREGROUND_INTENSITY);
                 printf("%s\n", file1Line);
                 SetConsoleTextAttribute(hConsole1, savedAttributes1);
-                printf("%s-line %d:\n", file2NameLastPiece, line2Counter);
+                if(state!=2) printf("%s-line: %d\n", file2NameLastPiece, line2Counter);
+                if(state!=3) printf("<<<<<%s>>>>>\nline: %d\n", file2Path, line2Counter);
                 HANDLE hConsole2 = GetStdHandle(STD_OUTPUT_HANDLE);
                 CONSOLE_SCREEN_BUFFER_INFO consoleInfo2;
                 WORD savedAttributes2;
@@ -74,7 +77,7 @@ int differenceCheck(char* file1Path, char* file2Path, int line1Beg, int line1End
         }
         if(line1Counter>=line1End || line2Counter>=line2End) break;
     }
-    if(beginflag==1) {
+    if(beginflag==1 && state!=2) {
         printf(">>>>>>>>>>\n");
     }
     else if(state==1 && beginflag==0) {

@@ -109,16 +109,26 @@ void checkoutBranch(char* branchName, int state) {
         strcat(tempFilePathsource, piceseofFilePath[idx1-1]);
         strcat(destFilePathsource, "\\");
         strcat(destFilePathsource, piceseofFilePath[idx1-1]);
-        FILE *batchFile=fopen("copyfile.bat", "w");
-        fprintf(batchFile, "@echo off\n");
-        fprintf(batchFile, "copy /Y \"%s\" \"%s\" > NUL \n", tempFilePathsource, destFilePathsource);
-        fprintf(batchFile, "exit /b 0\n");
-        fclose(batchFile);
-        system("copyfile.bat");
-        char batFilePath[MAX_PATH];
-        strcpy(batFilePath, filePath);
-        strcat(batFilePath, "\\copyfile.bat");
-        remove(batFilePath);
+        if(strcmp(tempFiletypetoCopy, "d")==0) {
+            DIR* dirptr=opendir(destFilePathsource);
+            if(dirptr==NULL) {
+                closedir(dirptr);
+                CreateDirectory(destFilePathsource, NULL);
+            }
+            closedir(dirptr);
+        }
+        else {
+            FILE *batchFile=fopen("copyfile.bat", "w");
+            fprintf(batchFile, "@echo off\n");
+            fprintf(batchFile, "copy /Y \"%s\" \"%s\" > NUL \n", tempFilePathsource, destFilePathsource);
+            fprintf(batchFile, "exit /b 0\n");
+            fclose(batchFile);
+            system("copyfile.bat");
+            char batFilePath[MAX_PATH];
+            strcpy(batFilePath, filePath);
+            strcat(batFilePath, "\\copyfile.bat");
+            remove(batFilePath);
+        } 
     }
     fclose(commitedFilesptr);
     FILE *batchFile=fopen("copyfile.bat", "w");

@@ -64,6 +64,8 @@ void mergeCommit(char* branch1, char* branch2) {
     char branch1TempModif[MAX_PATH]; char branch2TempModif[MAX_PATH];
     int diffCheckResult=0; int conflictFlag=0;
     while(fscanf(listofBranch1Filesptr, "%s%s%s", branch1TempFile, branch1TempType, branch1TempModif)==3) {
+        if(strcmp(branch1TempType, "d")==0) continue;
+        if(strstr(branch1TempFile, ".txt")==NULL) continue;
         while(fscanf(listofBranch2Filesptr, "%s%s%s", branch2TempFile, branch2TempType, branch2TempModif)==3) {
             if(strcmp(branch1TempFile, branch2TempFile)==0) {
                 char *match = strstr(branch1TempFile, repoPath); 
@@ -77,7 +79,7 @@ void mergeCommit(char* branch1, char* branch2) {
                 match = strstr(branch2TempFile, repoPath);
                 memmove(match, match + strlen(repoPath), strlen(match + strlen(repoPath)) + 1);
                 sprintf(placeofBranch2TempFile, "%s\\ngit\\branches\\%s\\commits\\%d\\content%s", repoPath, branch2, branch2LastCommit, branch2TempFile);
-                diffCheckResult=differenceCheck(placeofBranch1TempFile, placeofBranch2TempFile,1,100000,1,100000, 0);
+                diffCheckResult=differenceCheck(placeofBranch1TempFile, placeofBranch2TempFile,1,100000,1,100000, 2);
                 if(diffCheckResult==1) {
                     conflictFlag=1;
                 }
@@ -88,6 +90,7 @@ void mergeCommit(char* branch1, char* branch2) {
     }
     if(conflictFlag==1) {
         printf("merging branches was cancelled because of above conflict\nplease resolve conflicts manually and merge again\n");
+        fclose(listofBranch1Filesptr); fclose(listofBranch2Filesptr);
         return;
     }
     char newStagedFilesPath[MAX_PATH]; sprintf(newStagedFilesPath, "%s\\ngit\\info\\newstagedfiles.txt", repoPath);

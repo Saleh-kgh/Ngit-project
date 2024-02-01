@@ -329,3 +329,18 @@ int diffSER(int argc, char* argv[]) {
     }
     return 0;
 }
+
+int stashSER(int argc, char* argv[]) {
+    if(argc==3) {
+        if(strcmp(argv[2], "push")==0) return 1;
+        else if(strcmp(argv[2], "list")==0) return 3;
+        else if(strcmp(argv[2], "pop")==0) return 4;
+        else if(strcmp(argv[2], "clear")==0) return 6;
+    }
+    else if(argc==4) {
+        if(strcmp(argv[2], "push")==0) return 2;
+        if(strcmp(argv[2], "pop")==0) return 5;
+        if(strcmp(argv[2], "show")==0) return 7;
+    }
+    return 0;
+}
