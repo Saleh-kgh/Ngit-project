@@ -69,8 +69,8 @@ void resetStage(char* argv) {
     char subModified1[30];
     char stagedResetPath[MAX_PATH];
     if(strcmp(argv, "-undo")==0) {
-        char lastStagedPath[MAX_PATH]; strcpy(lastStagedPath, repoPathcopy2); strcat(lastStagedPath, "\\ngit\\info\\lasStaged.txt");
-        char lastStagedremPath[MAX_PATH]; strcpy(lastStagedremPath, repoPathcopy2); strcat(lastStagedremPath, "\\ngit\\info\\remlasStaged.txt");
+        char lastStagedPath[MAX_PATH]; strcpy(lastStagedPath, repoPathcopy2); strcat(lastStagedPath, "\\ngit\\info\\lastStaged.txt");
+        char lastStagedremPath[MAX_PATH]; strcpy(lastStagedremPath, repoPathcopy2); strcat(lastStagedremPath, "\\ngit\\info\\remlastStaged.txt");
         FILE* lastStagedptr=fopen(lastStagedPath, "r");  fscanf(lastStagedptr, "%s", stagedResetPath);
         FILE* lastStagedremptr=fopen(lastStagedremPath, "w");
         char tempLastStaged[MAX_PATH];

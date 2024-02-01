@@ -216,4 +216,6 @@ void commitCreator(int state, char* message) {
     }
     fclose(stagedFilesptr);
     fclose(begstagedFilesptr);
+    char removedFilesPath[MAX_PATH]; sprintf(removedFilesPath, "%s\\ngit\\info\\removedFiles.txt", repoPath);
+    FILE* removedFilesptr=fopen(removedFilesPath, "w"); fclose(removedFilesptr);
 }

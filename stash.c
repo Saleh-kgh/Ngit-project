@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include <time.h>
 #include <sys/stat.h>
+#include "diffCheck.h"
 
 void stashCreator(char* message){
     char currentPath[MAX_PATH];
@@ -33,7 +34,7 @@ void stashCreator(char* message){
         return;
     }
     fscanf(curCommithashptr, "%s", curCommithash); fclose(curCommithashptr);
-    char lastStashPath[MAX_PATH]; spritnf(lastStashPath, "%s\\ngit\\info\\lastStash.txt", repoPath); int lastStash=0;
+    char lastStashPath[MAX_PATH]; sprintf(lastStashPath, "%s\\ngit\\info\\lastStash.txt", repoPath); int lastStash=0;
     FILE* lastStashptr=fopen(lastStashPath, "r"); 
     if(lastStashptr==NULL) {
         fclose(lastStashptr);
@@ -44,7 +45,7 @@ void stashCreator(char* message){
         lastStashptr=fopen(lastStashPath, "w"); fprintf(lastStashptr, "%d", lastStash); fclose(lastStashptr);
     }
     char totalStashCountPath[MAX_PATH]; sprintf(totalStashCountPath, "d:\\ANGP\\ngit-project\\totalStashCount.txt"); int totalStashCount=0;
-    FILE* totalStashCountptr=foepn(totalStashCountPath, "r"); fscanf(totalStashCountptr, "%d", &totalStashCount); fclose(totalStashCountptr); totalStashCount++;
+    FILE* totalStashCountptr=fopen(totalStashCountPath, "r"); fscanf(totalStashCountptr, "%d", &totalStashCount); fclose(totalStashCountptr); totalStashCount++;
     totalStashCountptr=fopen(totalStashCountPath, "w"); fprintf(totalStashCountptr, "%d", totalStashCount); fclose(totalStashCountptr);    
 
     char newStashDirectoryPath[MAX_PATH]; sprintf(newStashDirectoryPath, "%s\\ngit\\stashingArea\\%d", repoPath, lastStash);
@@ -71,10 +72,10 @@ void stashCreator(char* message){
             sprintf(destinationofFile, "%s\\ngit\\stashingArea\\%d\\content%s", repoPath, lastStash, tempFIlePiece); 
             DIR* dirExists=opendir(destinationofFile);
             if(dirExists==NULL) {
-                fclose(dirExists);
+                closedir(dirExists);
                 CreateDirectory(destinationofFile, NULL);
             }
-            fclose(dirExists);
+            closedir(dirExists);
         }
         else {
             strcpy(tempFIlePiece, stagedTempFilePlace);
@@ -91,7 +92,7 @@ void stashCreator(char* message){
             remove(batFilePath);
         }
     }
-    fclsoe(stagedFilesptr);
+    fclose(stagedFilesptr);
     char allStashesPath[MAX_PATH]; sprintf(allStashesPath, "%s\\ngit\\info\\allStashes.txt", repoPath);
     char newAllStashesPath[MAX_PATH]; sprintf(newAllStashesPath, "%s\\ngit\\info\\newAllStashes.txt", repoPath);
     FILE* allStashesptr=fopen(allStashesPath, "r"); FILE* newAllStashesptr=fopen(newAllStashesPath, "w");
@@ -148,7 +149,7 @@ void stashList() {
             line[strcspn(line, "\n")] = '\0';
             strcpy(stashData[i], line);
         }
-        printf("stash idndex: %s\non branch: %s\nstash message: %s\n", stashData[0], stashData[3], stashData[4]);
+        printf("stash idndex: %s\non branch: %s\nstash message: %s\n/////////////////////////////////////////\n", stashData[0], stashData[3], stashData[4]);
     }
     fclose(allStashesptr);
     return;
@@ -188,9 +189,9 @@ void stashShow(char* stashIndex) {
             strcpy(stashData[i], line);
         }
         if(strcmp(stashIndex, stashData[0])==0) {
-            strcpy(stashBranch, stashData[4]);
-            strcpy(stashNumber, stashData[2]);
-            strcpy(stashCommithash, stashData[3]);
+            strcpy(stashBranch, stashData[3]);
+            strcpy(stashNumber, stashData[1]);
+            strcpy(stashCommithash, stashData[2]);
             flag=1;
             break;
         }
@@ -201,7 +202,7 @@ void stashShow(char* stashIndex) {
         return;
     }
     char allCommitsPath[MAX_PATH]; sprintf(allCommitsPath, "%s\\ngit\\info\\allCommits.txt", repoPath);
-    FILE* allCommitsptr=fopen(allCommitsPath, "r"); char commitData[7][40]; char line[100];
+    FILE* allCommitsptr=fopen(allCommitsPath, "r"); char commitData[7][40];
     int count=0;
     rewind(allCommitsptr);
     while (fgets(line, sizeof(line), allCommitsptr)) {
@@ -210,7 +211,7 @@ void stashShow(char* stashIndex) {
         for (int i = 1; i < 7; i++) {
             if (!fgets(line, sizeof(line), allCommitsptr)) {
                 printf("Error: Unexpected end of file\n");
-                return 0;
+                return;
             }
             line[strcspn(line, "\n")] = '\0';
             strcpy(commitData[i], line);
@@ -221,24 +222,25 @@ void stashShow(char* stashIndex) {
     fclose(allCommitsptr);
     char branchLastCommitPath[MAX_PATH]; sprintf(branchLastCommitPath, "%s\\ngit\\info\\%slastCommit.txt", repoPath, stashBranch); int branchLastCommit=0;
     FILE* branchLastCommitptr=fopen(branchLastCommitPath, "r"); fscanf(branchLastCommitptr, "%d", &branchLastCommit); fclose(branchLastCommitptr);
-    branchLastCommit-=count;
-    char stashedFilesPath[MAX_PATH]; sprintf(stashedFilesPath, "%s\\ngit\\stashArea\\%d\\stashedFiles.txt", repoPath, stashNumber);
-    char commitedFilesPath[MAX_PATH]; sprintf(stashedFilesPath, "%s\\ngit\\branches\\%s\\commits\\%d\\commitedfiles.txt", repoPath, stashBranch, branchLastCommit);
+    branchLastCommit-=count; int stashNumint=atoi(stashNumber);
+    char stashedFilesPath[MAX_PATH]; sprintf(stashedFilesPath, "%s\\ngit\\stashingArea\\%d\\stashedFiles.txt", repoPath, stashNumint);
+    char commitedFilesPath[MAX_PATH]; sprintf(commitedFilesPath, "%s\\ngit\\branches\\%s\\commits\\%d\\commitedfiles.txt", repoPath, stashBranch, branchLastCommit);
     char piceseofFilePath[MAX_PATH]; char stashFilePlace[MAX_PATH]; char commitedFilePlace[MAX_PATH];
     char commitedTempFile[MAX_PATH]; char commitedTempType[5]; char commitedTempModif[25];
     char stashedTempFile[MAX_PATH]; char stashedTempType[5]; char stashedTempModif[25]; int flag2=0;
-    FILE* stashedFilesptr=fopen(stashedFilesPath, "r"); FILE* stashedFilesptr=fopen(commitedFilesPath, "r");
+    FILE* stashedFilesptr=fopen(stashedFilesPath, "r"); FILE* commitedFilesptr=fopen(commitedFilesPath, "r");
     while(fscanf(stashedFilesptr, "%s%s%s", stashedTempFile, stashedTempType, stashedTempModif)==3) {
         if(strcmp(stashedTempType, "d")==0) continue;
         if(strstr(stashedTempFile, ".txt")==NULL) continue;
-        rewind(stashedFilesptr);
-        while(fscanf(stashedFilesptr, "%s%s%s", commitedTempFile, commitedTempType, commitedTempModif)==3) {
+        rewind(commitedFilesptr);
+        while(fscanf(commitedFilesptr, "%s%s%s", commitedTempFile, commitedTempType, commitedTempModif)==3) {
             if(strcmp(stashedTempFile, commitedTempFile)==0) {
                 strcpy(piceseofFilePath, stashedTempFile);
                 char *match = strstr(piceseofFilePath, repoPath);
                 memmove(match, match + strlen(repoPath), strlen(match + strlen(repoPath)) + 1);
-                sprintf(stashFilePlace, "%s\\ngit\\stashingArea\\%d\\content%s", repoPath, stashNumber, piceseofFilePath);
+                sprintf(stashFilePlace, "%s\\ngit\\stashingArea\\%d\\content%s", repoPath, stashNumint, piceseofFilePath);
                 sprintf(commitedFilePlace, "%s\\ngit\\branches\\%s\\commits\\%d\\content%s", repoPath, stashBranch, branchLastCommit, piceseofFilePath);
+                printf("%s %s\n", commitedFilePlace, stashFilePlace);
                 int returnValue=differenceCheck(commitedFilePlace, stashFilePlace,1,100000,1,100000, 2);
                 if(returnValue==0) flag2=1;
                 break;
@@ -285,9 +287,9 @@ void stashPop(char* stashIndex, int state) {
             strcpy(stashData[i], line);
         }
         if(strcmp(stashIndex, stashData[0])==0 || state==1) {
-            strcpy(stashBranch, stashData[4]);
-            strcpy(stashNumber, stashData[2]);
-            strcpy(stashCommithash, stashData[3]);
+            strcpy(stashBranch, stashData[3]);
+            strcpy(stashNumber, stashData[1]);
+            strcpy(stashCommithash, stashData[2]);
             strcpy(stashIndex, stashData[0]);
             flag=1;
             break;
@@ -298,13 +300,13 @@ void stashPop(char* stashIndex, int state) {
         printf("stash index <%s> is not valid\n", stashIndex);
         return;
     }
-
-    char stashedFilesPath[MAX_PATH]; sprintf(stashedFilesPath, "%s\\ngit\\stashingArea\\%d\\stashedFiles.txt", repoPath, stashNumber);
+    int stashNumint=atoi(stashNumber);
+    char stashedFilesPath[MAX_PATH]; sprintf(stashedFilesPath, "%s\\ngit\\stashingArea\\%d\\stashedFiles.txt", repoPath, stashNumint);
     char stagedFilesPath[MAX_PATH]; sprintf(stagedFilesPath, "%s\\ngit\\info\\stagedfiles.txt", repoPath);
     FILE* stagedFilesptr=fopen(stagedFilesPath, "r"); FILE* stashedFilesptr=fopen(stashedFilesPath, "r");
     char stagedTempFilePlace[MAX_PATH]; char stashedTempFilePlace[MAX_PATH];
-    char stagedTempFile[MAX_PATH]; char stashedTempFile[MAX_PATH]; char stagedTempType[MAX_PATH]; char stashedTempType[MAX_PATH];
-    char stagedTempModif[MAX_PATH]; char stashedTempModif[MAX_PATH];
+    char stagedTempFile[MAX_PATH]; char stashedTempFile[MAX_PATH]; char stagedTempType[5]; char stashedTempType[5];
+    char stagedTempModif[25]; char stashedTempModif[25];
     int diffCheckResult=0; int conflictFlag=0;
     while(fscanf(stagedFilesptr, "%s%s%s", stagedTempFile, stagedTempType, stagedTempModif)==3) {
         if(strcmp(stagedTempType, "d")==0) continue;
@@ -313,9 +315,9 @@ void stashPop(char* stashIndex, int state) {
             if(strcmp(stagedTempFile, stashedTempFile)==0) {
                 char *match = strstr(stashedTempFile, repoPath); 
                 memmove(match, match + strlen(repoPath), strlen(match + strlen(repoPath)) + 1);
-                sprintf(stashedTempFilePlace, "%s\\ngit\\stashingArea\\%d\\content%s", repoPath, stashNumber, stashedTempFile);
+                sprintf(stashedTempFilePlace, "%s\\ngit\\stashingArea\\%d\\content%s", repoPath, stashNumint, stashedTempFile);
                 strcpy(stagedTempFilePlace, stagedTempFile);
-                diffCheckResult=differenceCheck(stagedTempFilePlace, stashedTempFilePlace,1,100000,1,100000, 2);
+                diffCheckResult=differenceCheck(stagedTempFilePlace, stashedTempFilePlace,1,100000,1,100000, 3);
                 if(diffCheckResult==1) {
                     conflictFlag=1;
                 }
@@ -333,7 +335,7 @@ void stashPop(char* stashIndex, int state) {
     char tempFilePathtoCopy[MAX_PATH];
     char tempFiletypetoCopy[5];
     char tempFileModiftoCopy[25];
-    FILE* stashedFilesptr=fopen(stashedFilesPath, "r");
+    rewind(stashedFilesptr);
     while(fscanf(stashedFilesptr, "%s%s%s", tempFilePathtoCopy, tempFiletypetoCopy, tempFileModiftoCopy)==3) {
         if(strcmp(tempFiletypetoCopy, "d")==0) continue;
         char lastPieceofFiletoCopy[MAX_PATH];
@@ -349,7 +351,7 @@ void stashPop(char* stashIndex, int state) {
             idx1++;
         }
         char tempFilePathsource[MAX_PATH];
-        sprintf(tempFilePathsource, "%s\\ngit\\stashingArea\\%d\\content", repoPath, stashNumber);
+        sprintf(tempFilePathsource, "%s\\ngit\\stashingArea\\%d\\content", repoPath, stashNumint);
         char destFilePathsource[MAX_PATH];
         sprintf(destFilePathsource, "%s", repoPath);
         for(int i=0; i<idx1-1; i++) {
@@ -389,7 +391,7 @@ void stashPop(char* stashIndex, int state) {
             remove(batFilePath);
         } 
     }
-    fclose(stashedFilesptr); SetFileAttributes(stagedFilesPath, FILE_ATTRIBUTE_NORMAL); remove(stagedFilesPath);
+    fclose(stashedFilesptr); SetFileAttributes(stagedFilesPath, FILE_ATTRIBUTE_NORMAL);
     FILE *batchFile=fopen("copyfile.bat", "w");
     fprintf(batchFile, "@echo off\n");
     fprintf(batchFile, "copy /Y \"%s\" \"%s\" > NUL \n", stashedFilesPath, stagedFilesPath);
@@ -400,7 +402,7 @@ void stashPop(char* stashIndex, int state) {
     strcpy(batFilePath, currentPath);
     strcat(batFilePath, "\\copyfile.bat");
     remove(batFilePath);
-    char allStashesPath[MAX_PATH]; sprintf(allStashesPath, "%s\\ngit\\info\\allStashes.txt", repoPath);
+    sprintf(allStashesPath, "%s\\ngit\\info\\allStashes.txt", repoPath);
     char newAllStashesPath[MAX_PATH]; sprintf(newAllStashesPath, "%s\\ngit\\info\\newAllStashes.txt", repoPath);
     FILE* allStashesptr1=fopen(allStashesPath, "r"); FILE* newAllStashesptr1=fopen(newAllStashesPath, "w");
     char line1[100]; char stashData1[5][73];
@@ -439,8 +441,8 @@ void deleteofDirectory(const char *dirPath) {
             }
         }
     }
-
     closedir(directory);
+    rmdir(dirPath);
 }
 
 void stashClear() {
@@ -461,6 +463,6 @@ void stashClear() {
     char allStashesPath[MAX_PATH]; sprintf(allStashesPath, "%s\\ngit\\info\\allStashes.txt", repoPath);
     FILE* allStashesptr=fopen(allStashesPath, "w"); fclose(allStashesptr);
     char stashingAreaPath[MAX_PATH]; sprintf(stashingAreaPath, "%s\\ngit\\stashingArea", repoPath);
-    deleteofDirectory(stashingAreaPath);
+    deleteofDirectory(stashingAreaPath); CreateDirectory(stashingAreaPath, NULL);
     return;
 }

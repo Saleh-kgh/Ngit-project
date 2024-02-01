@@ -338,9 +338,11 @@ int stashSER(int argc, char* argv[]) {
         else if(strcmp(argv[2], "clear")==0) return 6;
     }
     else if(argc==4) {
-        if(strcmp(argv[2], "push")==0) return 2;
         if(strcmp(argv[2], "pop")==0) return 5;
         if(strcmp(argv[2], "show")==0) return 7;
+    }
+    else if(argc==5) {
+        if(strcmp(argv[2], "push")==0 && strcmp(argv[3], "-m")==0) return 2;
     }
     return 0;
 }

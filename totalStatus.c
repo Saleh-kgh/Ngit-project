@@ -113,4 +113,44 @@ void totalStatus() {
     fclose(newAllptr);
     fclose(oldAllptr);
     fclose(stagedFilesptr);
+    char removedFilesPath[MAX_PATH]; sprintf(removedFilesPath, "%s\\ngit\\info\\removedFiles.txt", repoPath);
+    FILE* removedFilesptr=fopen(removedFilesPath, "r"); char removedFilePath[MAX_PATH]; char removedFiletype[5]; char removedFileModif[25];
+    while(fscanf(removedFilesptr, "%s%s%s", removedFilePath, removedFiletype, removedFileModif)==3) {
+        if(strcmp(removedFiletype, "f")==0) {
+            printf("%s +D\n", removedFilePath);
+        }
+    }
+    rewind(removedFilesptr); 
+    FILE* newallFilesptr=fopen(newAlladdress, "r"); stagedFilesptr=fopen(stagedFilesaddress, "r");
+    char newFilePath[MAX_PATH]; char stagedFilePath[MAX_PATH]; char removeFilePath[MAX_PATH];
+    char newFileType[5]; char stagedFileType[5]; char removeFileType[5];
+    char newFileModif[25]; char stagedFileModif[25]; char removeFileModif[25];
+    int isinstaged=0; int isinremoved=0;
+    while(fscanf(newallFilesptr, "%s%s%s", newFilePath, newFileType, newFileModif)==3) {
+        if(strcmp(newFileType, "d")==0) continue;
+        while(fscanf(stagedFilesptr, "%s%s%s", stagedFilePath, stagedFileType, stagedFileModif)==3) {
+            if(strcmp(stagedFilePath, newFilePath)==0) {
+                isinstaged=1;
+                while(fscanf(removedFilesptr, "%s%s%s", removeFilePath, removeFileType, removeFileModif)==3) {
+                    if(strcmp(removeFilePath, stagedFilePath)==0) {
+                        isinremoved=1;
+                        break;
+                    }
+                }
+                break;
+            }
+        }
+        while(fscanf(removedFilesptr, "%s%s%s", removeFilePath, removeFileType, removeFileModif)==3) {
+            if(strcmp(removeFilePath, newFilePath)==0) {
+                isinremoved=1;
+                break;
+            }
+        }
+        if(isinremoved==0 && isinstaged==0) {
+            printf("%s -A\n", newFilePath);
+        }
+        isinremoved=0; isinstaged=0; rewind(stagedFilesptr); rewind(removedFilesptr);
+    }
+    fclose(removedFilesptr); fclose(newallFilesptr); fclose(stagedFilesptr);
+    return;
 }

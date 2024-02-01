@@ -15,6 +15,16 @@ int differenceCheck(char* file1Path, char* file2Path, int line1Beg, int line1End
         char tempFilePath[MAX_PATH]; sprintf(tempFilePath, "%s\\%s", currentPath, file1Path); file1Path=tempFilePath;
         char tempFilePath1[MAX_PATH]; sprintf(tempFilePath1, "%s\\%s", currentPath, file2Path); file2Path=tempFilePath1;
     }
+    char file1PathCopy[MAX_PATH]; 
+    if(state==2) {
+        strcpy(file1PathCopy, file1Path);
+        char* contentBeginig=strstr(file1PathCopy, "\\content"); char* ngitBegining=strstr(file1PathCopy, "\\ngit");
+        size_t removeLength = contentBeginig - ngitBegining + strlen("\\content");
+        memmove(ngitBegining, contentBeginig + strlen("\\content"), strlen(contentBeginig + strlen("\\content")) + 1);
+    }
+    if(state==3) {
+        strcpy(file1PathCopy, file1Path);
+    }
     FILE* file1ptr=fopen(file1Path, "r"); FILE* file2ptr=fopen(file2Path, "r");
     if(file1ptr==NULL || file2ptr==NULL) {
         printf("files were not found\n");
@@ -51,8 +61,8 @@ int differenceCheck(char* file1Path, char* file2Path, int line1Beg, int line1End
                     beginflag=1;
                 }
                 
-                if(state!=2) printf("%s-line: %d\n", file1NameLastPiece, line1Counter);
-                if(state!=3) printf("<<<<<%s>>>>>\nline: %d\n", file1Path, line1Counter);
+                if(state!=2 && state!=3) printf("%s-line: %d\n", file1NameLastPiece, line1Counter);
+                else printf("<<<<<%s>>>>>\nline: %d\n", file1PathCopy, line1Counter);
                 HANDLE hConsole1 = GetStdHandle(STD_OUTPUT_HANDLE);
                 CONSOLE_SCREEN_BUFFER_INFO consoleInfo1;
                 WORD savedAttributes1;
@@ -61,8 +71,8 @@ int differenceCheck(char* file1Path, char* file2Path, int line1Beg, int line1End
                 SetConsoleTextAttribute(hConsole1, FOREGROUND_GREEN | FOREGROUND_INTENSITY);
                 printf("%s\n", file1Line);
                 SetConsoleTextAttribute(hConsole1, savedAttributes1);
-                if(state!=2) printf("%s-line: %d\n", file2NameLastPiece, line2Counter);
-                if(state!=3) printf("<<<<<%s>>>>>\nline: %d\n", file2Path, line2Counter);
+                if(state!=2 && state!=3) printf("%s-line: %d\n", file2NameLastPiece, line2Counter);
+                else printf("<<<<<%s>>>>>\nline: %d\n", file1PathCopy, line2Counter);
                 HANDLE hConsole2 = GetStdHandle(STD_OUTPUT_HANDLE);
                 CONSOLE_SCREEN_BUFFER_INFO consoleInfo2;
                 WORD savedAttributes2;
@@ -83,6 +93,6 @@ int differenceCheck(char* file1Path, char* file2Path, int line1Beg, int line1End
     else if(state==1 && beginflag==0) {
         printf("there was no difference between file <%s> and file <%s>\\n", file1NameLastPiece, file2NameLastPiece);
     }
-    else if(state==0 && beginflag==0) return 0;
+    else if(beginflag==0) return 0;
     return 1;
 }

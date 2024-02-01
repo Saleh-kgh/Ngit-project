@@ -304,7 +304,7 @@ int main(int argc, char *argv[]) {
                 stashCreator("no message");
                 break;
             case 2:
-                stashCreator(argv[3]);
+                stashCreator(argv[4]);
                 break;
             case 3:
                 stashList();
@@ -317,6 +317,7 @@ int main(int argc, char *argv[]) {
                 break;
             case 6:
                 stashClear();
+                break;
             case 7:
                 stashShow(argv[3]);
                 break;

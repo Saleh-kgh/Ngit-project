@@ -23,6 +23,7 @@ int addtoStage(char argv[]) {
         if(result!=NULL) break;
     }
     fclose(reposfile);
+    char absolouteRepoPath[MAX_PATH]; strcpy(absolouteRepoPath, repoPath);
     if(firstAdd==0) {
         char lastStagedPath[MAX_PATH]; strcpy(lastStagedPath, repoPath); strcat(lastStagedPath, "\\ngit\\info\\lastStaged.txt");
         char lastStagedaddPath[MAX_PATH]; strcpy(lastStagedaddPath, repoPath); strcat(lastStagedaddPath, "\\ngit\\info\\lastStagedadd.txt");
@@ -214,10 +215,13 @@ int addtoStage(char argv[]) {
         else if(flag2==0 && flag1==1) {
             FILE* newStagedFilesptr=fopen(newstagedfileaddress, "w");
             rewind(stagedfilesread);
-            while(fscanf(stagedfilesread,"%s %s %s", subPath1, subType1, subModified1)==3) {
+            while(fscanf(stagedfilesread,"%s%s%s", subPath1, subType1, subModified1)==3) {
                 if(strcmp(subPath1, repoPathcopy3)==0) {
                     SetFileAttributes(repoPath, FILE_ATTRIBUTE_NORMAL);
                     DeleteFile(repoPath);
+                    char removedFilesPath[MAX_PATH]; sprintf(removedFilesPath, "%s\\ngit\\info\\removedFiles.txt", absolouteRepoPath);
+                    FILE* removedFilesptr=fopen(removedFilesPath, "a"); fprintf(removedFilesptr, "%s %s %s\n", subPath1, subType1, subModified1);
+                    fclose(removedFilesptr);
                 }
                 else {
                     fprintf(newStagedFilesptr,"%s %s %s\n", subPath1, subType1, subModified1);
