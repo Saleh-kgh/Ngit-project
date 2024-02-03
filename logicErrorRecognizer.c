@@ -124,13 +124,7 @@ int addLER(char* argv) { // hanooz wildcard piadesazi nashode
     strcat(currentPath, "\\");
     strcat(currentPath, argv);
     FILE* fileExisits=fopen(currentPath, "r");
-    int dirFlag=0;
-    struct stat directoryInfo;
-    if (stat(currentPath, &directoryInfo) != 0) {
-    }
-    if (S_ISDIR(directoryInfo.st_mode)) {
-        dirFlag=1;
-    }
+    DIR* dirExsists=opendir(currentPath);
     FILE* stagedFilesptr=fopen(stagedFilesaddress, "r");
     char subPath0[MAX_PATH];
     char subType0[5];
@@ -141,13 +135,14 @@ int addLER(char* argv) { // hanooz wildcard piadesazi nashode
             deleteFlag=1;
         }
     }
-    if((fileExisits==NULL && dirFlag==0) || !deleteFlag) {
+    if(fileExisits==NULL && dirExsists==NULL && !deleteFlag) {
         printf("this file <%s> is not inside this directory or doesn't exist in your repository\n", argv);
-        fclose(fileExisits);
+        fclose(fileExisits); closedir(dirExsists);
+        fclose(stagedFilesptr); fclose(fileExisits);
         return 0;
     }
     fclose(fileExisits);
-    FILE* newAllptr=fopen(newAlladdress, "r");
+    /*FILE* newAllptr=fopen(newAlladdress, "r");
     FILE* stagedFilesptr=fopen(stagedFilesaddress, "r");
     char subPath0[MAX_PATH];
     char subPath1[MAX_PATH];
@@ -201,11 +196,11 @@ int addLER(char* argv) { // hanooz wildcard piadesazi nashode
                 break;
             }
         }
-    }
-    fclose(fileExisits);
-    fclose(newAllptr);
-    fclose(stagedFilesptr);
-    fclose(oldAllptr);
+    }*/
+    fclose(fileExisits); closedir(dirExsists);
+    fclose(stagedFilesptr); fclose(fileExisits);
+    //fclose(newAllptr);
+    //fclose(oldAllptr);
     return 1;
     /*if(argc==3) {
         strcat(currentPath, "\\");

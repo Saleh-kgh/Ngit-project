@@ -188,7 +188,7 @@ int addtoStage(char argv[]) {
                             fclose(stagedfilesread);
                             fclose(stagedfilesptr);
                             fclose(allNewptr);
-                            return 0;
+                            return 1;
                         } 
                         break;
                     }
@@ -226,7 +226,6 @@ int addtoStage(char argv[]) {
             rewind(stagedfilesread);
             while(fscanf(stagedfilesread,"%s %s %s", subPath1, subType1, subModified1)==3) {
                 if(strcmp(subPath1, repoPathcopy3)==0) {
-                    printf("%s\n%s\n", subPath1, subModified0);
                     fprintf(newStagedFilesptr,"%s f %s\n", repoPathcopy3, subModified0);
                 }
                 else {

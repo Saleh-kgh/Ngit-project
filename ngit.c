@@ -123,37 +123,42 @@ int main(int argc, char *argv[]) {
         listFiles(0);
     }
     else if(strcmp(argv[1], "add")==0 ) {
-        int returnValue=0;
-        if(addSER(argc, argv)==0) return 0;
-        /*if(addLER(argc, argv)==0) return 0;*/
-        /*char target='*';
-        char* result=strchr(argv[2], target);
-        if(result!=NULL) {
-            printf("wildcard mojood nist");
-            return 0;
-        } */
+        int returnValue=0; int SERreturnValue=0;
+        char *endptr; long result;
+        SERreturnValue=addSER(argc, argv);
         listDirectories(0);
         listFiles(0);
-        if(argc==3) {
-            //if(addLER(argv[2])==0) return 0;
-            returnValue=addtoStage(argv[2]); 
-        }
-        else if(strcmp(argv[2], "-f")==0){
-            for(int i=3; i<argc; i++) {
-                //if(addLER(argv[i])==0) continue;
+        switch (SERreturnValue) {
+            case 0:
+                break;
+            case 1:
+                if(addLER(argv[2])==0) return 0;
+                returnValue=addtoStage(argv[2]); 
+                break;
+            case 2:
+                printf("sorry, redo is not supported\n");
+                break;
+            case 3:
+                for(int i=3; i<argc; i++) {
+                if(addLER(argv[i])==0) continue;
                 returnValue=addtoStage(argv[i]);
-            }
-        }
-        else {
-            char *endptr;
-            long result;
-            result = strtol(argv[3], &endptr, 10);
-            returnValue=stageDepth(result);
+                }
+                break;
+            case 4:
+                result = strtol(argv[3], &endptr, 10);
+                stageDepth(result);
+                break;
+            case 5:
+                for(int i=3; i<argc; i++) {
+                if(addLER(argv[i])==0) continue;
+                returnValue=addtoStage(argv[i]);
+                }
+                break;
         }
         if(returnValue==1) {
             printf("there were no changes to stage\n");
         }
-        else {
+        else if(returnValue>1){
              printf("changes successfully added\n");
         }
         return 0;
