@@ -123,6 +123,7 @@ int main(int argc, char *argv[]) {
         listFiles(0);
     }
     else if(strcmp(argv[1], "add")==0 ) {
+        int returnValue=0;
         if(addSER(argc, argv)==0) return 0;
         /*if(addLER(argc, argv)==0) return 0;*/
         /*char target='*';
@@ -135,21 +136,27 @@ int main(int argc, char *argv[]) {
         listFiles(0);
         if(argc==3) {
             //if(addLER(argv[2])==0) return 0;
-            addtoStage(argv[2]); return 0;
+            returnValue=addtoStage(argv[2]); 
         }
         else if(strcmp(argv[2], "-f")==0){
             for(int i=3; i<argc; i++) {
                 //if(addLER(argv[i])==0) continue;
-                addtoStage(argv[i]);
+                returnValue=addtoStage(argv[i]);
             }
-            return 0;
         }
         else {
             char *endptr;
             long result;
             result = strtol(argv[3], &endptr, 10);
-            stageDepth(result); return 0;
+            returnValue=stageDepth(result);
         }
+        if(returnValue==1) {
+            printf("there were no changes to stage\n");
+        }
+        else {
+             printf("changes successfully added\n");
+        }
+        return 0;
     }
     else if(strcmp(argv[1], "reset")==0 ) {
         if(resetSER(argc, argv)==0) return 0;

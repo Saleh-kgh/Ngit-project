@@ -60,7 +60,7 @@ void resetStage(char* argv) {
     strcat(repoPathcopy1, "\\ngit\\info\\newstagedfiles.txt");
     FILE* stagedfiles=fopen(repoPath, "r");
     FILE* newstagedfiles=fopen(repoPathcopy1, "w");
-    char lastStagedfile[MAX_PATH];
+    char lastStagedfile[MAX_PATH]; sprintf(lastStagedfile, "%s\\%s", currentPath, argv);
     char subPath0[MAX_PATH];
     char subPath1[MAX_PATH];
     char subType0[5];
@@ -86,6 +86,19 @@ void resetStage(char* argv) {
         strcpy(stagedResetPath, currentPath);
         strcat(stagedResetPath, "\\");
         strcat(stagedResetPath, argv);
+        char lastStagedPath[MAX_PATH]; strcpy(lastStagedPath, repoPathcopy2); strcat(lastStagedPath, "\\ngit\\info\\lastStaged.txt");
+        char lastStagedremPath[MAX_PATH]; strcpy(lastStagedremPath, repoPathcopy2); strcat(lastStagedremPath, "\\ngit\\info\\remlastStaged.txt");
+        FILE* lastStagedptr=fopen(lastStagedPath, "r");
+        FILE* lastStagedremptr=fopen(lastStagedremPath, "w");
+        char tempLastStaged[MAX_PATH];
+        while(fscanf(lastStagedptr, "%s", tempLastStaged)==1) {
+            if(strcmp(lastStagedfile, tempLastStaged)!=0)
+                fprintf(lastStagedremptr, "%s\n", tempLastStaged);
+        }
+        fclose(lastStagedptr); fclose(lastStagedremptr);
+        SetFileAttributes(lastStagedPath, FILE_ATTRIBUTE_NORMAL);
+        DeleteFile(lastStagedPath);                                  
+        rename(lastStagedremPath, lastStagedPath);
     }
 
     char needlePath[MAX_PATH];

@@ -131,7 +131,17 @@ int addLER(char* argv) { // hanooz wildcard piadesazi nashode
     if (S_ISDIR(directoryInfo.st_mode)) {
         dirFlag=1;
     }
-    if(fileExisits==NULL && dirFlag==0) {
+    FILE* stagedFilesptr=fopen(stagedFilesaddress, "r");
+    char subPath0[MAX_PATH];
+    char subType0[5];
+    char subModified0[30];
+    int deleteFlag=0;
+    while(fscanf(stagedFilesptr, "%s%s%s", subPath0, subType0, subModified0)==3) {
+        if(strcmp(subPath0, argv)==0) {
+            deleteFlag=1;
+        }
+    }
+    if((fileExisits==NULL && dirFlag==0) || !deleteFlag) {
         printf("this file <%s> is not inside this directory or doesn't exist in your repository\n", argv);
         fclose(fileExisits);
         return 0;
