@@ -286,16 +286,23 @@ void stashPop(char* stashIndex, int state) {
             line[strcspn(line, "\n")] = '\0';
             strcpy(stashData[i], line);
         }
-        if(strcmp(stashIndex, stashData[0])==0 || state==1) {
+        if(state==1) {
             strcpy(stashBranch, stashData[3]);
             strcpy(stashNumber, stashData[1]);
             strcpy(stashCommithash, stashData[2]);
-            strcpy(stashIndex, stashData[0]);
+            stashIndex=stashData[0];
+            flag=1;
+            break;
+        }
+        else if(strcmp(stashIndex, stashData[0])==0) {
+            strcpy(stashBranch, stashData[3]);
+            strcpy(stashNumber, stashData[1]);
+            strcpy(stashCommithash, stashData[2]);
             flag=1;
             break;
         }
     }
-    fclose(allStashesptr);
+    fclose(allStashesptr); 
     if(flag==0 && state==0) {
         printf("stash index <%s> is not valid\n", stashIndex);
         return;

@@ -55,6 +55,7 @@ void createBranch(char* newBranch) {
     system("copydir.bat");
     char batFilePath[MAX_PATH]; sprintf(batFilePath, "%s\\copydir.bat", filePath);
     remove(batFilePath);
+    printf("\033[32mbranch <%s> created successfully\033[0m\n", newBranch);
     return;
 }
 

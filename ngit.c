@@ -23,20 +23,25 @@
 #include "mergeCommit.h"
 #include "stash.h"
 
-int isAllowed=0;
+int detachedHead=1;
+int declaredUser=0;
+int repositoryFound=0;
 
-struct startupinfo {
+typedef struct {
     char username[50];
     char useremail[100];
     char currentbranch[50];
-}startupInfo;
+    char currentRepo[MAX_PATH];
+}startupinfo;
 
-void startUp() {
+void startUp(startupinfo* baseIntel) {
     FILE* userInfoptr = fopen("d:\\ANGP\\ngit-project\\userInfo.txt", "r");
-    fscanf(userInfoptr, "%s%s", startupInfo.username, startupInfo.useremail);
+    fscanf(userInfoptr, "%s%s", baseIntel->username, baseIntel->useremail);
     fclose(userInfoptr);
+    if(strcmp(baseIntel->username, "0")==0 || strcmp(baseIntel->useremail, "0")==0) declaredUser=0;
+    else declaredUser=1;
     FILE* branchfile=fopen("d:\\ANGP\\ngit-project\\currentbranch.txt","r");
-    fscanf(branchfile, "%s", startupInfo.currentbranch);
+    fscanf(branchfile, "%s", baseIntel->currentbranch);
     fclose(branchfile);
     char filePath[MAX_PATH];
     GetCurrentDirectory(MAX_PATH,filePath);
@@ -47,59 +52,81 @@ void startUp() {
         if (len > 0 && repoPath[len - 1] == '\n') {
             repoPath[len - 1] = '\0';
         }
-        char* result = strstr(filePath, repoPath);
-        if(result!=NULL) break;
+        char* result = strstr(filePath, repoPath); 
+        if(result!=NULL)  {
+            repositoryFound=1;
+            break;
+        }
     }
     fclose(reposfile);
-    char allCommitsPath[MAX_PATH]; sprintf(allCommitsPath, "%s\\ngit\\info\\allCommits.txt", repoPath);
-    FILE* allCommitptr=fopen(allCommitsPath, "r");
-    char line[100];
-    char HeadHash[9];
-    fgets(line, sizeof(line), allCommitptr);
-    line[strcspn(line, "\n")] = '\0';
-    fclose(allCommitptr);
-    strcpy(HeadHash, line);
-    char currenntHash[9];
-    char curCommithashPath[MAX_PATH]; sprintf(curCommithashPath, "%s\\ngit\\info\\curCommitHash.txt", repoPath);
-    FILE* curCommithashptr=fopen(curCommithashPath, "r"); fscanf(curCommithashptr, "%s", currenntHash); fclose(curCommithashptr);
-    if(strcmp(currenntHash, HeadHash)==0) isAllowed=1;
+
+    char HeadHash[9]="\0"; char currenntHash[9]="\0";
+    if(repositoryFound==1) {
+        strcpy(baseIntel->currentRepo,repoPath);
+        char allCommitsPath[MAX_PATH]; sprintf(allCommitsPath, "%s\\ngit\\info\\allCommits.txt", repoPath);
+        FILE* allCommitsptr=fopen(allCommitsPath, "r");
+        char commitData[7][40]; char line[100]; 
+        while (fgets(line, sizeof(line), allCommitsptr)) {
+            line[strcspn(line, "\n")] = '\0';
+            strcpy(commitData[0], line);
+            for (int i = 1; i < 7; i++) {
+                if (!fgets(line, sizeof(line), allCommitsptr)) {
+                    printf("Error: Unexpected end of file\n");
+                    return;
+                }
+                line[strcspn(line, "\n")] = '\0';
+                strcpy(commitData[i], line);
+            }
+            if(strcmp(baseIntel->currentbranch, commitData[1])==0) {
+                strcpy(HeadHash, commitData[0]);
+                break;
+            }
+        }
+        fclose(allCommitsptr);
+        char curCommithashPath[MAX_PATH]; sprintf(curCommithashPath, "%s\\ngit\\info\\curCommitHash.txt", repoPath);
+        FILE* curCommithashptr=fopen(curCommithashPath, "r"); fscanf(curCommithashptr, "%s", currenntHash); fclose(curCommithashptr);
+    }
+    if(strcmp(currenntHash, HeadHash)==0) detachedHead=0;
+    else if(strcmp(currenntHash, "")==0 || strcmp(HeadHash, "")==0) detachedHead=0;
 }
 
 int main(int argc, char *argv[]) {
-    startUp();
-    //if(isAllowed==0) printf("you are in detached HEAD state\nyou can only explore your project and use checkout commands\n");
-    int RESreturnedValue=0;
+    startupinfo baseIntel;
+    startUp(&baseIntel);
+    
     if(strcmp(argv[1], "config")==0 ) {
-        if(strcmp(argv[2], "user.name")==0 || strcmp(argv[3], "user.name")==0) {
-            RESreturnedValue = userInfoSER(argc, argv);
-            if(RESreturnedValue==0) return 0;
-            else if(RESreturnedValue==1) {
+        int returnValue=0;
+        returnValue = userInfoSER(argc, argv);
+        switch(returnValue) {
+            case 0:
+                printf("Invalid command due to misspell or extra words\n");  
+                break;
+            case 1:
                 userGlobalInfoE(argc, argv, 0);
-                //startUp();
-                return 0;
-            }
-            else {
-                if(userInfoLER()==0) return 0;
-                userLocalInfoE(argc, argv, 0);
-                //startUp();
-                return 0;
-            }
-        }
-        else if(strcmp(argv[2], "user.email")==0 || strcmp(argv[3], "user.email")==0) {
-            RESreturnedValue = userInfoSER(argc, argv);
-            if(RESreturnedValue==0) return 0; 
-            else if(RESreturnedValue==1) {
+                startUp(&baseIntel);
+                printf("your global username was set successfully\n");
+                break;
+            case 2:
                 userGlobalInfoE(argc, argv, 1);
-                //startUp();
-                return 0;
-            }
-            else {
-                if(userInfoLER()==0) return 0;
+                printf("your global email was set successfully\n");
+                break;
+            case 3:
+                if(repositoryFound==0) {
+                    printf("your are not inside any repository to set local userinfo\n"); return 0;
+                }
+                userLocalInfoE(argc, argv, 0);
+                startUp(&baseIntel);
+                printf("your local username was set successfully\n");
+                break;
+            case 4:
+                if(repositoryFound==0) {
+                    printf("your are not inside any repository to set local userinfo\n"); return 0;
+                }
                 userLocalInfoE(argc, argv, 1);
-                //startUp();
-                return 0;
-            }
+                printf("your local email was set successfully\n");
+                break;
         }
+        return 0;
         char alias_spell[6]="alais."; 
         for(int i=0; i<6; i++) {
             if(argv[3][i]!=alias_spell[i]) {
@@ -109,20 +136,30 @@ int main(int argc, char *argv[]) {
                 if(aliasSER(argc, argv)==0) return 0;
         }    
     }
-    /*if(strlen(startupInfo.username)<2 || strlen(startupInfo.useremail)<2) {
-        printf("please edit your personal info before anythings\n");
+    if(declaredUser==0) {
+        printf("please edit your global personal info in order to furthur use\n");
         return 0;
-    }*/
+    }
     else if(strcmp(argv[1], "init")==0 ) {
         if(initSER(argc, argv)==0) return 0;
         if(initLER()==0) return 0;
         makeHiddenNgitDir();
+        startUp(&baseIntel);
         listDirectories(1);
         listDirectories(0);
         listFiles(1);
         listFiles(0);
+        printf("initialized ngit repository at <%s> successfully\n", baseIntel.currentRepo);
     }
-    else if(strcmp(argv[1], "add")==0 ) {
+    else if(strcmp(argv[1], "add")==0) {
+        if(repositoryFound==0) {
+            printf("you are not inside any of your repostories to add files\n");
+            return 0;
+        }
+        if(detachedHead==1) {
+            printf("you can not add any files to staging area while on detached head\n");
+            return 0;
+        }
         int returnValue=0; int SERreturnValue=0;
         char *endptr; long result;
         SERreturnValue=addSER(argc, argv);
@@ -149,7 +186,7 @@ int main(int argc, char *argv[]) {
                 stageDepth(result);
                 break;
             case 5:
-                for(int i=3; i<argc; i++) {
+                for(int i=2; i<argc; i++) {
                 if(addLER(argv[i])==0) continue;
                 returnValue=addtoStage(argv[i]);
                 }
@@ -164,19 +201,60 @@ int main(int argc, char *argv[]) {
         return 0;
     }
     else if(strcmp(argv[1], "reset")==0 ) {
-        if(resetSER(argc, argv)==0) return 0;
-        if(resetLER(argc, argv)==0) return 0;
+        if(repositoryFound==0) {
+            printf("you are not inside any of your repostories to add files\n");
+            return 0;
+        }
+        if(detachedHead==1) {
+            printf("you can not add any files to staging area while on detached head\n");
+            return 0;
+        }
+        int returnValue=0;
+        returnValue=resetSER(argc, argv);
         listDirectories(0);
         listFiles(0);
-        resetStage(argv[2]); return 0;
+        switch (returnValue) {
+            case 0:
+                printf("Invalid command due to misspell or extra words\n");
+                break;
+            case 1:
+                if(resetLER(argc, argv[2])==0) return 0;
+                resetStage(argv[2]);
+                break;
+            case 2:
+                for(int i=3; i<argc; i++) {
+                    if(resetLER(argc, argv[i])==0) continue;
+                    resetStage(argv[i]);
+                }
+                break;
+            case 3:
+                for(int i=2; i<argc; i++) {
+                    if(resetLER(argc, argv[i])==0) continue;
+                    resetStage(argv[i]);
+                }
+                break;
+        }
+        return 0;
     }
     else if(strcmp(argv[1], "status")==0 ) {
+        if(repositoryFound==0) {
+            printf("you are not inside any of your repostories to check status\n");
+            return 0;
+        }
         if(statusSER(argc, argv)==0) return 0;
         listDirectories(0);
         listFiles(0);
         totalStatus(); return 0;
     }
     else if(strcmp(argv[1], "commit")==0 ) {
+        if(repositoryFound==0) {
+            printf("you are not inside any of your repostories to commit\n");
+            return 0;
+        }
+        if(detachedHead==1) {
+            printf("you can not commit while on detached head state\n");
+            return 0;
+        }
         if(commitSER(argc, argv)==0) return 0;
         if(commitLER()==0) return 0;
         listDirectories(0);
@@ -187,22 +265,51 @@ int main(int argc, char *argv[]) {
         listFiles(1);
         listDirectories(0);
         listFiles(0);
+        startUp(&baseIntel);
         return 0;
     }
     else if(strcmp(argv[1], "set")==0 ) {
+        if(repositoryFound==0) {
+            printf("you are not inside any of your repostories to set shortcuts\n");
+            return 0;
+        }
+        if(detachedHead==1) {
+            printf("you can not do commit related actions while on detached head state\n");
+            return 0;
+        }
         if(setSER(argc, argv)==0) return 0;
         if(commitSetLER(argv[5])==0) return 0;
         commitMesSet(argv[3], argv[5]); return 0;
     }
     else if(strcmp(argv[1], "replace")==0 ) {
+        if(repositoryFound==0) {
+            printf("you are not inside any of your repostories to replace shortcuts\n");
+            return 0;
+        }
+        if(detachedHead==1) {
+            printf("you can not do commit related actions while on detached head state\n");
+            return 0;
+        }
         if(replaceSER(argc, argv)==0) return 0;
         commitMesReplace(argv[3], argv[5]); return 0;
     }
     else if(strcmp(argv[1], "remove")==0 ) {
+        if(repositoryFound==0) {
+            printf("you are not inside any of your repostories to remove shortcuts\n");
+            return 0;
+        }
+        if(detachedHead==1) {
+            printf("you can not do commit related actions while on detached head state\n");
+            return 0;
+        }
         if(removeSER(argc, argv)==0) return 0;
         commitMesRemove(argv[3]); return 0;
     }
     else if(strcmp(argv[1], "log")==0) {
+        if(repositoryFound==0) {
+            printf("you are not inside any of your repostories to review commit history\n");
+            return 0;
+        }
         if(logSER(argc, argv)==0) return 0;
         int returnValue=logLER(argc, argv);
         if(returnValue==0) return 0;
@@ -325,7 +432,7 @@ int main(int argc, char *argv[]) {
                 stashPop("empty", 1);
                 break;
             case 5:
-                stashPop(argv[3], 1);
+                stashPop(argv[3], 0);
                 break;
             case 6:
                 stashClear();
