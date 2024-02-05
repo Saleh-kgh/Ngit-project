@@ -8,4 +8,5 @@ int resetLER(int argc, char* argv);
 int commitLER();
 int commitSetLER(char* shortcutName);
 int logLER(int argc, char* argv[]);
+int checkoutLER(char* branchName);
 #endif

@@ -91,23 +91,23 @@ void revertCommit(char* hash, char* message, int state) {
     fclose(allCommitptr); fclose(mergeHashesptr);
     switch (state) {
         case 1:
-            checkoutHash(commitHash);
+            checkoutHash(commitHash,0);
             commitCreator(0, commitMessage);
             return;
         case 3:
-            checkoutHash(commitHash);
+            checkoutHash(commitHash,0);
             commitCreator(0, commitMessage);
             return;
         case 4:
             break;
         case 5:
-            checkoutHash(commitHash);
+            checkoutHash(commitHash,0);
             commitCreator(0, message);
             return;
     }
     char curCommithashPath[MAX_PATH]; sprintf(curCommithashPath, "%s\\ngit\\info\\curCommithash.txt", repoPath); char curBranch[20];
     FILE* curCommithashptr=fopen(curCommithashPath, "r"); fscanf(curCommithashptr, "%s", curBranch); fclose(curCommithashptr);
-    checkoutHash(commitHash);
+    checkoutHash(commitHash,0);
     curCommithashptr=fopen(curCommithashPath, "w"); fprintf(curCommithashptr, "%s", curBranch); fclose(curCommithashptr);
     return;
 }

@@ -533,3 +533,41 @@ int logLER(int argc, char* argv[]) {
     else if(strcmp(argv[2],"-before")==0) return 5;
     else if(strcmp(argv[2],"-search")==0) return 6;
 }
+
+int checkoutLER(char* branchName) {
+    char directoryPath[MAX_PATH];
+    GetCurrentDirectory(MAX_PATH, directoryPath);
+    char repoPath[MAX_PATH];
+    FILE* reposfile=fopen("d:\\ANGP\\ngit-project\\repositories.txt","r");
+    while(fgets(repoPath, sizeof(repoPath), reposfile)!= NULL) {
+        size_t len = strlen(repoPath);
+        if (len > 0 && repoPath[len - 1] == '\n') {
+            repoPath[len - 1] = '\0';
+        }
+        char* result = strstr(directoryPath, repoPath);
+        if(result!=NULL) {
+            break;
+        } 
+    }
+    fclose(reposfile);
+
+    char stagedFilesPath[MAX_PATH]; sprintf(stagedFilesPath, "%s\\ngit\\info\\stagedfiles.txt", repoPath);
+    char oldAllFilesPath[MAX_PATH]; sprintf(oldAllFilesPath, "%s\\ngit\\info\\contents\\oldAll.txt", repoPath);
+    FILE* stagedFilesptr=fopen(stagedFilesPath, "r"); FILE* oldAllFilesptr=fopen(oldAllFilesPath, "r");
+    char filePath0[MAX_PATH]; char fileType0[5]; char fileModified0[20];
+    char filePath1[MAX_PATH]; char fileType1[5]; char fileModified1[20];
+    while(fscanf(stagedFilesptr, "%s%s%s", filePath0, fileType0, fileModified0)==3) {
+        if(strcmp(fileType0, "d")==0) continue;
+        while(fscanf(oldAllFilesptr, "%s%s%s", filePath1, fileType1, fileModified1)==3) {
+            if(strcmp(filePath0, filePath1)==0) {
+                if(strcmp(fileModified0, fileModified1)!=0) {
+                    printf("you can not checkout while you have changes not commited\n");
+                    fclose(oldAllFilesptr); fclose(stagedFilesptr);
+                    return 0;
+                }
+            }
+        }
+    }
+    fclose(oldAllFilesptr); fclose(stagedFilesptr);
+    return 1;
+}

@@ -21,6 +21,18 @@ void createBranch(char* newBranch) {
         if(result!=NULL) break;
     }
     fclose(reposfile);
+    char allBranchesPath[MAX_PATH];
+    sprintf(allBranchesPath, "%s\\ngit\\info\\branches.txt", repoPath);
+    FILE* branchExistCheck=fopen(allBranchesPath, "r"); char Branch[20];
+    while(fgets(Branch, sizeof(Branch), branchExistCheck)!=NULL) {
+        Branch[strcspn(Branch, "\n")]='\0';
+        if(strcmp(Branch, newBranch)==0) {
+            printf("this branch <%s> already exists\n", newBranch);
+            fclose(branchExistCheck);
+            return;
+        }
+    }
+    fclose(branchExistCheck);
     char currentBranchPath[MAX_PATH];
     strcpy(currentBranchPath, repoPath);
     strcat(currentBranchPath, "\\ngit\\info\\currentbranch.txt");
@@ -34,15 +46,12 @@ void createBranch(char* newBranch) {
     char newBranchlastComPath[MAX_PATH];
     sprintf(newBranchlastComPath, "%s\\ngit\\info\\%slastCommit.txt", repoPath, newBranch);
     FILE* newBranchlastComptr=fopen(newBranchlastComPath, "w"); fprintf(newBranchlastComptr, "1"); fclose(newBranchlastComptr);
-    char allBranchesPath[MAX_PATH];
-    sprintf(allBranchesPath, "%s\\ngit\\info\\branches.txt", repoPath);
     FILE* allBranchesptr=fopen(allBranchesPath, "a"); fprintf(allBranchesptr, "%s\n", newBranch); fclose(allBranchesptr);
     char newBranchPath[MAX_PATH];
     sprintf(newBranchPath, "%s\\ngit\\branches\\%s", repoPath, newBranch); CreateDirectory(newBranchPath, NULL);
     strcat(newBranchPath, "\\commits"); CreateDirectory(newBranchPath, NULL);
     strcat(newBranchPath, "\\1"); CreateDirectory(newBranchPath, NULL);
     char curBranLastFolderPath[MAX_PATH]; sprintf(curBranLastFolderPath, "%s\\ngit\\branches\\%s\\commits\\%d", repoPath, currentbranch, lastCommit);
-    currentBranchptr=fopen(currentBranchPath, "w"); fprintf(currentBranchptr, "%s", newBranch); fclose(currentBranchptr);
     FILE* batchFile = fopen("copydir.bat", "w");
     
     fprintf(batchFile, "@echo off\n");

@@ -109,7 +109,7 @@ int commitSER(int argc, char* argv[]) {
         printf("There is no comment to your commit.");
         return 0;
     }
-    if(argc==3 && error_occured==0) {
+    if(argc==3) {
         printf("There is no comment to your commit.");
         return 0;
     }
@@ -209,14 +209,19 @@ int checkoutSER(int argc, char* argv[]) {
     if(i==4) {
         if(strlen(argv[2])==4)
             return 3;
+        else if(argv[2][4]=='-') {
+            int length=strlen(argv[2]);
+            for(int i=5; i<length; i++) {
+                if(argv[2][i]<48 || argv[2][i]>57) {
+                    printf("invalid number\n");
+                    return 0;
+                }
+            }
+            return 4;
+        }
     }
     if(strlen(argv[2])==8) {
-        for(int i=0; i<8; i++) {
-            if(argv[2][i]<48 || argv[2][i]>57) {
-                return 1;
-            }
-        }
-        return 2;
+        
     }
     
     if(error_occured==1) {

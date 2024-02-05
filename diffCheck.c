@@ -18,9 +18,12 @@ int differenceCheck(char* file1Path, char* file2Path, int line1Beg, int line1End
     char file1PathCopy[MAX_PATH]; 
     if(state==2) {
         strcpy(file1PathCopy, file1Path);
-        char* contentBeginig=strstr(file1PathCopy, "\\content"); char* ngitBegining=strstr(file1PathCopy, "\\ngit");
-        size_t removeLength = contentBeginig - ngitBegining + strlen("\\content");
-        memmove(ngitBegining, contentBeginig + strlen("\\content"), strlen(contentBeginig + strlen("\\content")) + 1);
+        char* contentBeginig = strstr(file1PathCopy, "\\content");
+        char* ngitBegining = strstr(file1PathCopy, "\\ngit");
+        if (ngitBegining != NULL && contentBeginig != NULL) {
+            size_t removeLength = contentBeginig - ngitBegining + strlen("\\content");
+            strcpy(ngitBegining, contentBeginig + strlen("\\content"));
+        }
     }
     if(state==3) {
         strcpy(file1PathCopy, file1Path);

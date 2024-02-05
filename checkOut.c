@@ -49,6 +49,7 @@ void checkoutBranch(char* branchName, int state) {
     if(lastCommitBranptr==NULL) {
         printf("branch <%s> does not exist\n", branchName); return;
     }
+
     fscanf(lastCommitBranptr, "%d", &lastCommit); fclose(lastCommitBranptr);
     if(state!=0) lastCommit-=state;
     char branchLastComContPath[MAX_PATH]; sprintf(branchLastComContPath, "%s\\ngit\\branches\\%s\\commits\\%d", repoPath, branchName, lastCommit);
@@ -146,12 +147,18 @@ void checkoutBranch(char* branchName, int state) {
     remove(batFilePath);
     char currentbranchPath[MAX_PATH]; sprintf(currentbranchPath, "%s\\ngit\\info\\currentbranch.txt", repoPath);
     FILE* curBranchptr=fopen(currentbranchPath, "w"); fprintf(curBranchptr, "%s", branchName); fclose(curBranchptr);
+    char currentbranchMainPath[MAX_PATH]; sprintf(currentbranchMainPath, "d:\\ANGP\\ngit-project\\currentbranch.txt");
+    FILE* curBranchMainptr=fopen(currentbranchMainPath, "w"); fprintf(curBranchMainptr, "%s", branchName); fclose(curBranchMainptr);
     return;
 }
 
-void checkoutHash(char* hash) {
+void checkoutHash(char* hash, int state) {
     int flag=0;
     if(strcmp(hash, "HEAD")==0) flag=1;
+    int number=0;
+    if(state==1) {
+        number=atoi(hash);
+    }
     char filePath[MAX_PATH];
     GetCurrentDirectory(MAX_PATH,filePath);
     char repoPath[MAX_PATH];
@@ -181,7 +188,8 @@ void checkoutHash(char* hash) {
             line[strcspn(line, "\n")] = '\0';
             strcpy(commitData[i], line);
         }
-        if(strcmp(hash, commitData[0])==0 || flag==1) {
+        number--;
+        if(strcmp(hash, commitData[0])==0 || flag==1 || (state==1 && number==0)) {
             hashExists=1;
             break;
         }
@@ -210,4 +218,26 @@ void checkoutHash(char* hash) {
     }
     fclose(allCommitptr);
     checkoutBranch(branchOfHash, count);
+}
+
+void checkoutHead() {
+    char filePath[MAX_PATH];
+    GetCurrentDirectory(MAX_PATH,filePath);
+    char repoPath[MAX_PATH];
+    FILE* reposfile=fopen("d:\\ANGP\\ngit-project\\repositories.txt","r");
+    while(fgets(repoPath, sizeof(repoPath), reposfile)!= NULL) {
+        size_t len = strlen(repoPath);
+        if (len > 0 && repoPath[len - 1] == '\n') {
+            repoPath[len - 1] = '\0';
+        }
+        char* result = strstr(filePath, repoPath);
+        if(result!=NULL) break;
+    }
+    fclose(reposfile);
+
+    char removedFiles[MAX_PATH]; sprintf(removedFiles, "%s\\ngit\\info\\removedFiles.txt", repoPath);
+    char lastStaged[MAX_PATH]; sprintf(lastStaged, "%s\\ngit\\info\\lastStaged.txt", repoPath);
+    FILE* removedFilesptr=fopen(removedFiles, "w"); fclose(removedFilesptr);
+    FILE* lastStagedptr=fopen(lastStaged, "w"); fclose(lastStagedptr);
+    return;
 }

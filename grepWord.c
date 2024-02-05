@@ -80,7 +80,7 @@ void grepWord(char* fileName, char* targetWord, char* commitHash, int state) {
     else {
         strcpy(fileAbsolutePath, filePath);
     }
-    int wordFoudFlag=0; int lineCounter=1;
+    int wordFoudFlag=0; int lineCounter=0;
     char fileLine[1000]; char oneLineWords[60][20];
     FILE* targetFileptr=fopen(fileAbsolutePath, "r");
     if(targetFileptr==NULL) {
@@ -91,6 +91,7 @@ void grepWord(char* fileName, char* targetWord, char* commitHash, int state) {
     while(fgets(fileLine, sizeof(fileLine), targetFileptr)!=NULL) {
         fileLine[strcspn(fileLine, "\n")] = '\0';
         const char *wordPosition = strstr(fileLine, targetWord);
+        lineCounter++;
         if (wordPosition == NULL) {
             continue;
         }
@@ -117,7 +118,7 @@ void grepWord(char* fileName, char* targetWord, char* commitHash, int state) {
         printf("%s\n", secondPart);
         free(firstPart);
         free(secondPart);
-        lineCounter++;
+        
     }
     fclose(targetFileptr);
     if(wordFoudFlag==0) {

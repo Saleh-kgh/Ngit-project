@@ -149,7 +149,7 @@ int main(int argc, char *argv[]) {
         listDirectories(0);
         listFiles(1);
         listFiles(0);
-        printf("initialized ngit repository at <%s> successfully\n", baseIntel.currentRepo);
+        printf("initialized ngit repository at <%s>\n", baseIntel.currentRepo);
     }
     else if(strcmp(argv[1], "add")==0) {
         if(repositoryFound==0) {
@@ -216,7 +216,7 @@ int main(int argc, char *argv[]) {
         switch (returnValue) {
             case 0:
                 printf("Invalid command due to misspell or extra words\n");
-                break;
+                return 0;
             case 1:
                 if(resetLER(argc, argv[2])==0) return 0;
                 resetStage(argv[2]);
@@ -234,6 +234,7 @@ int main(int argc, char *argv[]) {
                 }
                 break;
         }
+        printf("changes were successfully discarded from staging area\n");
         return 0;
     }
     else if(strcmp(argv[1], "status")==0 ) {
@@ -333,36 +334,80 @@ int main(int argc, char *argv[]) {
             dateLog(argv[3], returnValue-4);
             return 0;
         }
-        if(returnValue==5) {
+        if(returnValue==6) {
             wordLog(argv[3]);
             return 0;
         } 
     }
     else if(strcmp(argv[1], "branch")==0 ) {
+        if(repositoryFound==0) {
+            printf("you are not inside any of your repostories to create a new branch\n");
+            return 0;
+        }
+        if(detachedHead==1) {
+            printf("you can not create a new commit while on detached head state\n");
+            return 0;
+        }
         if(branchSER(argc, argv)==0) return 0;
-        if(argc==3) createBranch(argv[2]);
+        listFiles(0);
+        listDirectories(0);
+        if(argc==3) {
+            createBranch(argv[2]);
+            listFiles(1);
+            listDirectories(1);
+        }
         if(argc==2) listBranches();
         return 0;
     }
     else if(strcmp(argv[1], "checkout")==0) {
+        if(repositoryFound==0) {
+            printf("you are not inside any of your repostories to checkout\n");
+            return 0;
+        }
         int returnedVale=checkoutSER(argc, argv);
         if(returnedVale==0) return 0;
+        if(checkoutLER(argv[2])==0) return 0;
+        listFiles(0);
+        listDirectories(0);
         if(returnedVale==1) checkoutBranch(argv[2], 0);
-        else if(returnedVale==2) checkoutHash(argv[2]); 
-        else if(returnedVale==3) checkoutHash(argv[2]); 
+        else if(returnedVale==2) checkoutHash(argv[2],0); 
+        else if(returnedVale==3) checkoutHash(argv[2],0); 
+        else if(returnedVale==4) {
+            int digits=strlen(argv[2])-5;
+            char number[digits];
+            for(int i=0; i<digits; i++) {
+                number[i]=argv[2][i+5];
+            }
+            checkoutHash(number,1); 
+        }
+        startUp(&baseIntel);
+        if(detachedHead==0) {
+            listFiles(1);
+            listDirectories(1);
+            checkoutHead();
+        }
+        printf("checked out successfully\n");
         return 0;
     }
     else if(strcmp(argv[1], "revert")==0) {
+        if(repositoryFound==0) {
+            printf("you are not inside any of your repostories to revert\n");
+            return 0;
+        }
+        if(detachedHead==1) {
+            printf("you can not create a new reverted commit while on detached head state\n");
+            return 0;
+        }
         int returnValue=revertSER(argc, argv);
         switch (returnValue) {
             case 0:
                 printf("Invalid command due to misspell or extra words!");
-                break;
+                return 0;
             case 1:
                 revertCommit(argv[2], "nuull", returnValue);
                 break;
             case 2:
-                checkoutHash(argv[3]);
+                checkoutHash(argv[3],0);
                 commitCreator(0, argv[2]);
                 break;
             case 3:
@@ -375,9 +420,17 @@ int main(int argc, char *argv[]) {
                 revertCommit(argv[3], argv[2], returnValue);
                 break;
         }
+        listFiles(0);
+        listFiles(1);
+        listDirectories(0);
+        listDirectories(1);
         return 0;
     }
     else if(strcmp(argv[1], "tag")==0) {
+        if(repositoryFound==0) {
+            printf("you are not inside any of your repostories to tag commits\n");
+            return 0;
+        }
         int returnValue=tagSER(argc, argv);
         switch (returnValue) {
             case 0:
@@ -414,6 +467,10 @@ int main(int argc, char *argv[]) {
         return 0;
     }
     else if(strcmp(argv[1], "stash")==0) {
+        if(repositoryFound==0) {
+            printf("you are not inside any of your repostories to create stash\n");
+            return 0;
+        }
         int returnValue=stashSER(argc, argv);
         switch (returnValue) {
             case 0:
@@ -444,6 +501,10 @@ int main(int argc, char *argv[]) {
         return 0;
     }
     else if(strcmp(argv[1], "grep")==0) {
+        if(repositoryFound==0) {
+            printf("you are not inside any of your repostories to grep words\n");
+            return 0;
+        }
         int returnedVale=grepSER(argc, argv);
         switch (returnedVale) {
             case 0:
@@ -465,6 +526,10 @@ int main(int argc, char *argv[]) {
         return 0;
     }
     else if(strcmp(argv[1], "diff")==0) {
+        if(repositoryFound==0) {
+            printf("you are not inside any of your repostories to diff files\n");
+            return 0;
+        }
         int returnValue=diffSER(argc, argv);
         if(returnValue==0) {
             printf("Invalid command due to misspell or extra words\n");
@@ -491,6 +556,14 @@ int main(int argc, char *argv[]) {
         return 0;
     }
     else if(strcmp(argv[1], "merge")==0 && strcmp(argv[2], "-b")==0) {
+        if(repositoryFound==0) {
+            printf("you are not inside any of your repostories to merge branches\n");
+            return 0;
+        }
+        if(detachedHead==1) {
+            printf("you can not merge two branches while on detached head state\n");
+            return 0;
+        }
         mergeCommit(argv[3], argv[4]);
         return 0;
     }

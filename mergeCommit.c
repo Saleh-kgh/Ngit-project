@@ -51,12 +51,12 @@ void mergeCommit(char* branch1, char* branch2) {
         }
     }
     char listofBranch1FilesPath[MAX_PATH]; char listofBranch2FilesPath[MAX_PATH];
-    if(flagCurrentBranch==0) {
+    //if(flagCurrentBranch==0) {
         sprintf(listofBranch1FilesPath, "%s\\ngit\\branches\\%s\\commits\\%d\\commitedfiles.txt", repoPath, branch1, branch1LastCommit);
-    }
-    else {
+    //}
+    //else {
         sprintf(listofBranch1FilesPath, "%s\\ngit\\info\\stagedfiles.txt", repoPath);
-    }
+    //}
     sprintf(listofBranch2FilesPath, "%s\\ngit\\branches\\%s\\commits\\%d\\commitedfiles.txt", repoPath, branch2, branch2LastCommit);
     FILE* listofBranch1Filesptr=fopen(listofBranch1FilesPath, "r"); FILE* listofBranch2Filesptr=fopen(listofBranch2FilesPath, "r");
     char placeofBranch1TempFile[MAX_PATH]; char placeofBranch2TempFile[MAX_PATH];
@@ -79,6 +79,7 @@ void mergeCommit(char* branch1, char* branch2) {
                 match = strstr(branch2TempFile, repoPath);
                 memmove(match, match + strlen(repoPath), strlen(match + strlen(repoPath)) + 1);
                 sprintf(placeofBranch2TempFile, "%s\\ngit\\branches\\%s\\commits\\%d\\content%s", repoPath, branch2, branch2LastCommit, branch2TempFile);
+                printf("%s %s\n", placeofBranch1TempFile, placeofBranch2TempFile);
                 diffCheckResult=differenceCheck(placeofBranch1TempFile, placeofBranch2TempFile,1,100000,1,100000, 2);
                 if(diffCheckResult==1) {
                     conflictFlag=1;

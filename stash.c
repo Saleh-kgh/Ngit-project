@@ -429,6 +429,7 @@ void stashPop(char* stashIndex, int state) {
     }
     fclose(newAllStashesptr1); fclose(allStashesptr1); SetFileAttributes(allStashesPath, FILE_ATTRIBUTE_NORMAL);
     remove(allStashesPath); rename(newAllStashesPath, allStashesPath);
+    printf("stash was poped successfully\n");
     return;
 }
 
@@ -471,5 +472,6 @@ void stashClear() {
     FILE* allStashesptr=fopen(allStashesPath, "w"); fclose(allStashesptr);
     char stashingAreaPath[MAX_PATH]; sprintf(stashingAreaPath, "%s\\ngit\\stashingArea", repoPath);
     deleteofDirectory(stashingAreaPath); CreateDirectory(stashingAreaPath, NULL);
+    printf("removed all stashes\n");
     return;
 }
