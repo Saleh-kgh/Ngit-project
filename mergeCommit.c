@@ -51,12 +51,7 @@ void mergeCommit(char* branch1, char* branch2) {
         }
     }
     char listofBranch1FilesPath[MAX_PATH]; char listofBranch2FilesPath[MAX_PATH];
-    //if(flagCurrentBranch==0) {
-        sprintf(listofBranch1FilesPath, "%s\\ngit\\branches\\%s\\commits\\%d\\commitedfiles.txt", repoPath, branch1, branch1LastCommit);
-    //}
-    //else {
-        sprintf(listofBranch1FilesPath, "%s\\ngit\\info\\stagedfiles.txt", repoPath);
-    //}
+    sprintf(listofBranch1FilesPath, "%s\\ngit\\branches\\%s\\commits\\%d\\commitedfiles.txt", repoPath, branch1, branch1LastCommit);
     sprintf(listofBranch2FilesPath, "%s\\ngit\\branches\\%s\\commits\\%d\\commitedfiles.txt", repoPath, branch2, branch2LastCommit);
     FILE* listofBranch1Filesptr=fopen(listofBranch1FilesPath, "r"); FILE* listofBranch2Filesptr=fopen(listofBranch2FilesPath, "r");
     char placeofBranch1TempFile[MAX_PATH]; char placeofBranch2TempFile[MAX_PATH];
@@ -66,25 +61,21 @@ void mergeCommit(char* branch1, char* branch2) {
     while(fscanf(listofBranch1Filesptr, "%s%s%s", branch1TempFile, branch1TempType, branch1TempModif)==3) {
         if(strcmp(branch1TempType, "d")==0) continue;
         if(strstr(branch1TempFile, ".txt")==NULL) continue;
+        rewind(listofBranch2Filesptr);
         while(fscanf(listofBranch2Filesptr, "%s%s%s", branch2TempFile, branch2TempType, branch2TempModif)==3) {
+            printf("branch2: %s\n", branch2TempFile);
             if(strcmp(branch1TempFile, branch2TempFile)==0) {
+                printf("b1: %s b2: %s\n", branch1TempFile, branch2TempFile);
                 char *match = strstr(branch1TempFile, repoPath); 
                 memmove(match, match + strlen(repoPath), strlen(match + strlen(repoPath)) + 1);
-                if(flagCurrentBranch==0) {
-                    sprintf(placeofBranch1TempFile, "%s\\ngit\\branches\\%s\\commits\\%d\\content%s", repoPath, branch1, branch1LastCommit, branch1TempFile);
-                }
-                else {
-                    sprintf(placeofBranch1TempFile, "%s\\ngit\\stagingArea%s", repoPath, branch1TempFile);
-                }
+                sprintf(placeofBranch1TempFile, "%s\\ngit\\branches\\%s\\commits\\%d\\content%s", repoPath, branch1, branch1LastCommit, branch1TempFile);
                 match = strstr(branch2TempFile, repoPath);
                 memmove(match, match + strlen(repoPath), strlen(match + strlen(repoPath)) + 1);
                 sprintf(placeofBranch2TempFile, "%s\\ngit\\branches\\%s\\commits\\%d\\content%s", repoPath, branch2, branch2LastCommit, branch2TempFile);
-                printf("%s %s\n", placeofBranch1TempFile, placeofBranch2TempFile);
                 diffCheckResult=differenceCheck(placeofBranch1TempFile, placeofBranch2TempFile,1,100000,1,100000, 2);
                 if(diffCheckResult==1) {
                     conflictFlag=1;
                 }
-                rewind(listofBranch2Filesptr);
                 break;
             }
         }
@@ -107,29 +98,24 @@ void mergeCommit(char* branch1, char* branch2) {
         else {
             char *match = strstr(branch1TempFile, repoPath); 
             memmove(match, match + strlen(repoPath), strlen(match + strlen(repoPath)) + 1);
-            if(flagCurrentBranch==0) {
-                sprintf(placeofBranch1TempFile, "%s\\ngit\\branches\\%s\\commits\\%d\\content%s", repoPath, branch1, branch1LastCommit, branch1TempFile);
-                char fileStagingPlace[MAX_PATH]; sprintf(fileStagingPlace, "%s\\ngit\\stagingArea%s", repoPath, branch1TempFile);
-                FILE *batchFile=fopen("copyfile.bat", "w");
-                fprintf(batchFile, "@echo off\n");
-                fprintf(batchFile, "copy /Y \"%s\" \"%s\" > NUL \n", placeofBranch1TempFile, fileStagingPlace);
-                fprintf(batchFile, "exit /b 0\n");
-                fclose(batchFile);
-                system("copyfile.bat");
-                char batFilePath[MAX_PATH]; strcpy(batFilePath, currentPath); strcat(batFilePath, "\\copyfile.bat");
-                remove(batFilePath);
-            }
-            else {
-                sprintf(placeofBranch1TempFile, "%s\\ngit\\stagingArea%s", repoPath, branch1TempFile);
-            }
-            char destinationofCopy[MAX_PATH]; sprintf(destinationofCopy, "%s%s", repoPath, branch1TempFile);
+            sprintf(placeofBranch1TempFile, "%s\\ngit\\branches\\%s\\commits\\%d\\content%s", repoPath, branch1, branch1LastCommit, branch1TempFile);
+            char fileStagingPlace[MAX_PATH]; sprintf(fileStagingPlace, "%s\\ngit\\stagingArea%s", repoPath, branch1TempFile);
             FILE *batchFile=fopen("copyfile.bat", "w");
+            fprintf(batchFile, "@echo off\n");
+            fprintf(batchFile, "copy /Y \"%s\" \"%s\" > NUL \n", placeofBranch1TempFile, fileStagingPlace);
+            fprintf(batchFile, "exit /b 0\n");
+            fclose(batchFile);
+            system("copyfile.bat");
+            char batFilePath[MAX_PATH]; strcpy(batFilePath, currentPath); strcat(batFilePath, "\\copyfile.bat");
+            remove(batFilePath);
+            char destinationofCopy[MAX_PATH]; sprintf(destinationofCopy, "%s%s", repoPath, branch1TempFile);
+            batchFile=fopen("copyfile.bat", "w");
             fprintf(batchFile, "@echo off\n");
             fprintf(batchFile, "copy /Y \"%s\" \"%s\" > NUL \n", placeofBranch1TempFile, destinationofCopy);
             fprintf(batchFile, "exit /b 0\n");
             fclose(batchFile);
             system("copyfile.bat");
-            char batFilePath[MAX_PATH]; strcpy(batFilePath, currentPath); strcat(batFilePath, "\\copyfile.bat");
+            strcpy(batFilePath, currentPath); strcat(batFilePath, "\\copyfile.bat");
             remove(batFilePath);
         }
     }
@@ -190,6 +176,6 @@ void mergeCommit(char* branch1, char* branch2) {
     commitCreator(0, "no message"); 
     totalCommitCountptr=fopen(totalCommitPath, "w"); fprintf(totalCommitCountptr, "%d", totalCommitCount+1); fclose(totalCommitCountptr);
     char mergedCommitsPath[MAX_PATH]; sprintf(mergedCommitsPath, "%s\\ngit\\info\\mergeHashes.txt", repoPath);
-    FILE* mergedCommitsptr=fopen(mergedCommitsPath, "a"); fprintf(mergedCommitsptr, "%d %s %s\n", totalCommitCount+90000000, branch1, branch2); fclose(mergedCommitsptr);
+    FILE* mergedCommitsptr=fopen(mergedCommitsPath, "a"); fprintf(mergedCommitsptr, "%d %s %s\n", totalCommitCount+90000001, branch1, branch2); fclose(mergedCommitsptr);
     return;
 } 

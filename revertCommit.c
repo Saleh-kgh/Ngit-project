@@ -63,6 +63,7 @@ void revertCommit(char* hash, char* message, int state) {
             break;
         } 
     }
+    rewind(allCommitptr);
     while (fgets(line, sizeof(line), allCommitptr)) {
         Xcopy--;
         line[strcspn(line, "\n")] = '\0';
@@ -75,6 +76,7 @@ void revertCommit(char* hash, char* message, int state) {
             line[strcspn(line, "\n")] = '\0';
             strcpy(commitData[i], line);
         }
+        rewind(mergeHashesptr);
         while(fscanf(mergeHashesptr, "%s%s%s", mergeHash, mergeFbranch, mergeMbranch)==3) {
             if(strcmp(mergeHash, commitData[0])==0) {
                 if(strcmp(mergeFbranch, commitBranch)==0 || strcmp(mergeMbranch, commitBranch)==0) {

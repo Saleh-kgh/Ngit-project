@@ -50,6 +50,7 @@ int differenceCheck(char* file1Path, char* file2Path, int line1Beg, int line1End
         strcpy(file2NameLastPiece, piece2);
         piece2=strtok(NULL, "\\");
     }
+    int diffResult=0;
     while(fgets(file1Line, sizeof(file1Line), file1ptr)!=NULL) {
         line1Counter++;
         file1Line[strcspn(file1Line, "\n")]='\0';
@@ -63,7 +64,7 @@ int differenceCheck(char* file1Path, char* file2Path, int line1Beg, int line1End
                     printf("<<<<<<<<<<\n");
                     beginflag=1;
                 }
-                
+                diffResult=1;
                 if(state!=2 && state!=3) printf("%s-line: %d\n", file1NameLastPiece, line1Counter);
                 else printf("<<<<<%s>>>>>\nline: %d\n", file1PathCopy, line1Counter);
                 HANDLE hConsole1 = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -96,6 +97,8 @@ int differenceCheck(char* file1Path, char* file2Path, int line1Beg, int line1End
     else if(state==1 && beginflag==0) {
         printf("there was no difference between file <%s> and file <%s>\\n", file1NameLastPiece, file2NameLastPiece);
     }
-    else if(beginflag==0) return 0;
+    else if(beginflag==0 && state!=2) return 0;
+    else if(state==2 && diffResult==1) return 1;
+    else if(state==2 && diffResult==0) return 0;
     return 1;
 }
